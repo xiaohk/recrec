@@ -8,8 +8,8 @@ import componentCSS from './app.css?inline';
  * App element.
  *
  */
-@customElement('jay-app')
-export class JayApp extends LitElement {
+@customElement('recrec-app')
+export class RecRecApp extends LitElement {
   //==========================================================================||
   //                              Class Properties                            ||
   //==========================================================================||
@@ -58,6 +58,6 @@ export class JayApp extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'jay-app': JayApp;
+    'recrec-app': RecRecApp;
   }
 }
