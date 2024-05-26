@@ -7,8 +7,8 @@ import componentCSS from './<FTName>.css?inline';
 /**
  * [FTName | sentencecase] element.
  */
-@customElement('jay-[FTName]')
-export class Jay<FTName | pascalcase> extends LitElement {
+@customElement('recrec-[FTName]')
+export class RecRec<FTName | pascalcase> extends LitElement {
   //==========================================================================||
   //                              Class Properties                            ||
   //==========================================================================||
@@ -60,6 +60,6 @@ export class Jay<FTName | pascalcase> extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'jay-<FTName>': Jay<FTName | pascalcase>;
+    'recrec-<FTName>': RecRec<FTName | pascalcase>;
   }
 }
