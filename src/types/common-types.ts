@@ -2,6 +2,12 @@
  * Type definitions
  */
 
+export enum Step {
+  Author = 'author',
+  Paper = 'paper',
+  Recommender = 'recommender'
+}
+
 export interface SimpleEventMessage {
   message: string;
 }

@@ -1,16 +1,16 @@
 import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import '../author-view/author-view';
 
-import componentCSS from './app.css?inline';
+import '../header-bar/header-bar';
+
+import componentCSS from './author-view.css?inline';
 
 /**
- * App element.
- *
+ * Author view element.
  */
-@customElement('recrec-app')
-export class RecRecApp extends LitElement {
+@customElement('recrec-author-view')
+export class RecRecAuthorView extends LitElement {
   //==========================================================================||
   //                              Class Properties                            ||
   //==========================================================================||
@@ -21,6 +21,11 @@ export class RecRecApp extends LitElement {
   constructor() {
     super();
   }
+
+  /**
+   * This method is called when the DOM is added for the first time
+   */
+  firstUpdated() {}
 
   /**
    * This method is called before new DOM is updated and rendered
@@ -46,10 +51,9 @@ export class RecRecApp extends LitElement {
   //==========================================================================||
   render() {
     return html`
-      <div class="app">
-        <div class="view-container">
-          <recrec-author-view></recrec-author-view>
-        </div>
+      <div class="author-view">
+        <recrec-header-bar></recrec-header-bar>
+        <div class="content-container">content</div>
       </div>
     `;
   }
@@ -63,6 +67,6 @@ export class RecRecApp extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'recrec-app': RecRecApp;
+    'recrec-author-view': RecRecAuthorView;
   }
 }

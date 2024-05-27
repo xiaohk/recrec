@@ -1,0 +1,21 @@
+.author-view {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+
+  box-sizing: border-box;
+}
+
+recrec-header-bar {
+  width: 100%;
+}
+
+.content-container {
+  width: 100%;
+  flex: 1 0 auto;
+  background-color: var(--blue-50);
+}

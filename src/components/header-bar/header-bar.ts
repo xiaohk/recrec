@@ -1,19 +1,33 @@
 import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import '../author-view/author-view';
+import { Step } from '../../types/common-types';
 
-import componentCSS from './app.css?inline';
+import iconCaret from '../../images/icon-caret-down.svg?raw';
+import componentCSS from './header-bar.css?inline';
+
+const steps = [Step.Author, Step.Paper, Step.Recommender];
+
+const titleString: Record<Step, string> = {
+  [Step.Author]: 'Find Your Semantic Scholar Author Information',
+  [Step.Paper]: 'Select Your Papers to Find Recommenders',
+  [Step.Recommender]: 'Refine the Potential Recommenders'
+};
 
 /**
- * App element.
- *
+ * Header bar element.
  */
-@customElement('recrec-app')
-export class RecRecApp extends LitElement {
+@customElement('recrec-header-bar')
+export class RecRecHeaderBar extends LitElement {
   //==========================================================================||
   //                              Class Properties                            ||
   //==========================================================================||
+  @property({ type: Number })
+  curStepIndex = 0;
+
+  get curStep() {
+    return steps[this.curStepIndex];
+  }
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -21,6 +35,11 @@ export class RecRecApp extends LitElement {
   constructor() {
     super();
   }
+
+  /**
+   * This method is called when the DOM is added for the first time
+   */
+  firstUpdated() {}
 
   /**
    * This method is called before new DOM is updated and rendered
@@ -46,10 +65,16 @@ export class RecRecApp extends LitElement {
   //==========================================================================||
   render() {
     return html`
-      <div class="app">
-        <div class="view-container">
-          <recrec-author-view></recrec-author-view>
+      <div class="header-bar">
+        <div class="svg-icon move-pre">${unsafeHTML(iconCaret)}</div>
+        <div class="title-middle">
+          <span class="step-info"
+            >Step ${this.curStepIndex + 1}/${steps.length}:</span
+          >
+          <span class="title">${titleString[this.curStep]}</span>
         </div>
+
+        <div class="svg-icon move-next">${unsafeHTML(iconCaret)}</div>
       </div>
     `;
   }
@@ -63,6 +88,6 @@ export class RecRecApp extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'recrec-app': RecRecApp;
+    'recrec-header-bar': RecRecHeaderBar;
   }
 }

@@ -1,16 +1,15 @@
 import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import '../author-view/author-view';
+import '../app/app';
 
-import componentCSS from './app.css?inline';
+import componentCSS from './page.css?inline';
 
 /**
- * App element.
- *
+ * Page element.
  */
-@customElement('recrec-app')
-export class RecRecApp extends LitElement {
+@customElement('recrec-page')
+export class RecRecPage extends LitElement {
   //==========================================================================||
   //                              Class Properties                            ||
   //==========================================================================||
@@ -21,6 +20,11 @@ export class RecRecApp extends LitElement {
   constructor() {
     super();
   }
+
+  /**
+   * This method is called when the DOM is added for the first time
+   */
+  firstUpdated() {}
 
   /**
    * This method is called before new DOM is updated and rendered
@@ -46,10 +50,8 @@ export class RecRecApp extends LitElement {
   //==========================================================================||
   render() {
     return html`
-      <div class="app">
-        <div class="view-container">
-          <recrec-author-view></recrec-author-view>
-        </div>
+      <div class="page">
+        <div class="app-container"><recrec-app></recrec-app></div>
       </div>
     `;
   }
@@ -63,6 +65,6 @@ export class RecRecApp extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'recrec-app': RecRecApp;
+    'recrec-page': RecRecPage;
   }
 }
