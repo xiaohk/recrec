@@ -9,7 +9,7 @@ import componentCSS from './header-bar.css?inline';
 const steps = [Step.Author, Step.Paper, Step.Recommender];
 
 const titleString: Record<Step, string> = {
-  [Step.Author]: 'Find Your Semantic Scholar Author Information',
+  [Step.Author]: 'Find Your Semantic Scholar Profile',
   [Step.Paper]: 'Select Your Papers to Find Recommenders',
   [Step.Recommender]: 'Refine the Potential Recommenders'
 };

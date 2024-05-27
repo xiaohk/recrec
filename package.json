@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@floating-ui/dom": "^1.6.1",
+    "@shoelace-style/shoelace": "^2.15.1",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@xiaohk/utils": "^0.0.6",
     "eslint": "^8.56.0",
