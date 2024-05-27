@@ -66,7 +66,7 @@ export class RecRecHeaderBar extends LitElement {
   render() {
     return html`
       <div class="header-bar">
-        <div class="svg-icon move-pre">${unsafeHTML(iconCaret)}</div>
+        <button class="svg-icon move-pre">${unsafeHTML(iconCaret)}</button>
         <div class="title-middle">
           <span class="step-info"
             >Step ${this.curStepIndex + 1}/${steps.length}:</span
@@ -74,7 +74,7 @@ export class RecRecHeaderBar extends LitElement {
           <span class="title">${titleString[this.curStep]}</span>
         </div>
 
-        <div class="svg-icon move-next">${unsafeHTML(iconCaret)}</div>
+        <button class="svg-icon move-next">${unsafeHTML(iconCaret)}</button>
       </div>
     `;
   }

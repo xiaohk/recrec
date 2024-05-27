@@ -52,7 +52,6 @@ export class RecRecAuthorView extends LitElement {
   render() {
     return html`
       <div class="author-view">
-        <recrec-header-bar></recrec-header-bar>
         <div class="content-container">content</div>
       </div>
     `;

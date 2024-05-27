@@ -17,6 +17,11 @@
   }
 }
 
+button {
+  all: unset;
+  cursor: pointer;
+}
+
 .svg-icon {
   display: flex;
   justify-content: center;

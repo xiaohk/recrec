@@ -15,6 +15,12 @@
 }
 
 .view-container {
+  display: flex;
+  flex-flow: column;
   width: 100%;
   height: 100%;
+}
+
+recrec-author-view {
+  flex: 1 0 auto;
 }

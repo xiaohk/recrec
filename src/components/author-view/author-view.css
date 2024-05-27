@@ -10,10 +10,6 @@
   box-sizing: border-box;
 }
 
-recrec-header-bar {
-  width: 100%;
-}
-
 .content-container {
   width: 100%;
   flex: 1 0 auto;

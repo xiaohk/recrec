@@ -48,6 +48,7 @@ export class RecRecApp extends LitElement {
     return html`
       <div class="app">
         <div class="view-container">
+          <recrec-header-bar></recrec-header-bar>
           <recrec-author-view></recrec-author-view>
         </div>
       </div>
