@@ -1,9 +1,14 @@
 import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import type {
+  SemanticAuthorSearchResponse,
+  SemanticAuthorSearch
+} from '../../types/common-types';
 
 import '@shoelace-style/shoelace/dist/components/input/input.js';
 import '../header-bar/header-bar';
+import '../author-list/author-list';
 
 import '@shoelace-style/shoelace/dist/themes/light.css';
 import componentCSS from './author-view.css?inline';
@@ -17,6 +22,11 @@ export class RecRecAuthorView extends LitElement {
   //                              Class Properties                            ||
   //==========================================================================||
   profileName: string | null = null;
+  searchAuthorTimer: number | null = null;
+  lastCompletedQuery: string = '';
+
+  @state()
+  searchAuthors: SemanticAuthorSearch[] = [];
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -44,13 +54,51 @@ export class RecRecAuthorView extends LitElement {
   //==========================================================================||
   //                              Event Handlers                              ||
   //==========================================================================||
-  searchInput(e: InputEvent) {
-    console.log(e);
+  searchInput(e: InputEvent, delay = 600) {
+    const target = e.currentTarget as HTMLInputElement;
+    const query = target.value;
+
+    if (query === '') {
+      return;
+    }
+
+    // Debounce the search
+    if (this.searchAuthorTimer !== null) {
+      clearTimeout(this.searchAuthorTimer);
+    }
+
+    this.searchAuthorTimer = setTimeout(() => {
+      this.searchAuthorByName(query).then(
+        () => {},
+        () => {}
+      );
+    }, delay);
   }
 
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
+  async searchAuthorByName(query: string) {
+    // Skip the query if it is the same as the last query
+    if (query === this.lastCompletedQuery) {
+      return;
+    }
+
+    const baseURL = 'https://api.semanticscholar.org/graph/v1/author/search';
+    const url = `${baseURL}?query=${encodeURIComponent(query)}`;
+    const result = await fetch(url);
+    if (!result.ok) {
+      throw Error(`Search request failed with status: ${result.statusText}`);
+    }
+
+    const data = (await result.json()) as SemanticAuthorSearchResponse;
+
+    // Pass the author info to the author list component
+    this.searchAuthors = data.data;
+    this.lastCompletedQuery = query;
+
+    console.log(data);
+  }
 
   //==========================================================================||
   //                           Templates and Styles                           ||
@@ -71,13 +119,22 @@ export class RecRecAuthorView extends LitElement {
               type="search"
               size="medium"
               placeholder="Search Semantic Scholar profiles"
+              spellcheck="false"
               clearable
               @sl-input=${(e: InputEvent) => this.searchInput(e)}
+              @sl-change=${(e: InputEvent) => {
+                this.searchInput(e, 0);
+              }}
             ></sl-input>
           </div>
 
-          <div class="search-result"></div>
+          <div class="search-result">
+            <recrec-author-list
+              .authors=${this.searchAuthors}
+            ></recrec-author-list>
+          </div>
         </div>
+
         <div class="footer">
           <button class="button">Confirm</button>
         </div>

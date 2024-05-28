@@ -2,6 +2,26 @@
  * Type definitions
  */
 
+export interface SemanticAuthorSearch {
+  authorId: string;
+  name: string;
+}
+
+export interface SemanticAuthorSearchResponse {
+  total: number;
+  offset: number;
+  next: number;
+  data: SemanticAuthorSearch[];
+}
+
+export interface SemanticAuthorDetail {
+  affiliations: string[];
+  citationCount: number;
+  homepage: string;
+  name: string;
+  paperCount: number;
+}
+
 export enum Step {
   Author = 'author',
   Paper = 'paper',

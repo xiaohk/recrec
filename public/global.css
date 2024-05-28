@@ -96,8 +96,8 @@ button:focus {
 
   /* Layouts */
   --border-radius: 5px;
-  --container-h-padding: 12px;
-  --container-v-padding: 10px;
+  --container-h-padding: 20px;
+  --container-v-padding: 20px;
 
   /* Font sizes */
   --font-d1: 0.9375rem;
