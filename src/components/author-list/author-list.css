@@ -1,7 +1,8 @@
 .author-list {
   width: 100%;
   height: 100%;
-  padding: 5px var(--container-v-padding);
+  min-height: 0px;
+  padding: 0px;
 
   display: flex;
   flex-direction: column;
@@ -9,42 +10,72 @@
   align-items: flex-start;
 
   box-sizing: border-box;
-  overflow-y: auto;
-
-  border: 1px solid var(--gray-300);
-  border-top: none;
 }
 
 .author-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+
   .col-icon {
-    width: auto;
+    width: 0;
+    min-width: min-content;
   }
 
   .col-name {
-    width: auto;
+    width: 0;
+    min-width: min-content;
   }
 
   .col-paper-count {
-    width: auto;
+    width: 0;
+    min-width: min-content;
   }
 
   .col-citation-count {
+    width: 0;
+    min-width: min-content;
+  }
+
+  .col-filler {
     width: auto;
+  }
+
+  .author-row {
+    cursor: pointer;
+    width: 100%;
+
+    .svg-icon {
+      color: var(--gray-300);
+    }
+
+    &:hover {
+      background-color: var(--blue-50);
+    }
   }
 
   & td {
     vertical-align: center;
+    padding: 2px 0;
   }
-}
 
-.author-row {
-  /* width: 100%; */
-  /* display: flex; */
-  /* align-items: center; */
-  /* gap: 20px; */
+  .person-icon {
+    padding-left: calc(1rem - 2px);
+    padding-right: 10px;
+  }
 
-  .svg-icon {
-    color: var(--gray-300);
+  .name {
+    padding-right: 50px;
+    font-weight: 600;
+  }
+
+  .paper-count {
+    color: var(--gray-500);
+    padding-right: 50px;
+  }
+
+  .citation-count {
+    color: var(--gray-500);
   }
 }
 

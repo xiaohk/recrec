@@ -10,7 +10,7 @@ import type {
 import iconPerson from '../../images/icon-person.svg?raw';
 import componentCSS from './author-list.css?inline';
 
-const AUTHORS_PER_PAGE = 20;
+const AUTHORS_PER_PAGE = 50;
 
 /**
  * Author list element.
@@ -116,14 +116,15 @@ export class RecRecAuthorList extends LitElement {
     )) {
       authors = html`${authors}
         <tr class="author-row">
-          <td class="svg-icon">${unsafeHTML(iconPerson)}</td>
+          <td class="svg-icon person-icon">${unsafeHTML(iconPerson)}</td>
           <td class="name">
             ${author.name}${author.affiliations.length > 0
               ? ` (${author.affiliations[0]})`
               : ''}
           </td>
-          <td class="paper-count">${author.paperCount} publications</td>
+          <td class="paper-count">${author.paperCount} papers</td>
           <td class="citation-count">${author.citationCount} citations</td>
+          <td></td>
         </tr> `;
     }
 
@@ -135,6 +136,7 @@ export class RecRecAuthorList extends LitElement {
             <col class="col-name" />
             <col class="col-paper-count" />
             <col class="col-citation-count" />
+            <col class="col-filler" />
           </colgroup>
           ${authors}
         </table>
