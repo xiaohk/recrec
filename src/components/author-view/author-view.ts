@@ -105,6 +105,19 @@ export class RecRecAuthorView extends LitElement {
     }, 200);
   }
 
+  confirmButtonClicked() {
+    if (this.selectedProfile === null) {
+      return;
+    }
+
+    // Notify the parent to move to the next step
+    const event = new Event('confirm-button-clicked', {
+      bubbles: true,
+      composed: true
+    });
+    this.dispatchEvent(event);
+  }
+
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
@@ -193,7 +206,13 @@ export class RecRecAuthorView extends LitElement {
         </div>
 
         <div class="footer">
-          <button class="button">Confirm</button>
+          <button
+            class="confirm-button"
+            ?disabled=${this.selectedProfile === null}
+            @click=${() => this.confirmButtonClicked()}
+          >
+            Confirm
+          </button>
         </div>
       </div>
     `;
