@@ -63,6 +63,18 @@ export class RecRecAuthorList extends LitElement {
   //==========================================================================||
   //                              Event Handlers                              ||
   //==========================================================================||
+  authorRowClicked(author: SemanticAuthorDetail) {
+    // Notify the parent about the selection
+    const event: CustomEvent<SemanticAuthorDetail> = new CustomEvent(
+      'author-row-clicked',
+      {
+        bubbles: true,
+        composed: true,
+        detail: author
+      }
+    );
+    this.dispatchEvent(event);
+  }
 
   //==========================================================================||
   //                             Private Helpers                              ||
@@ -119,7 +131,12 @@ export class RecRecAuthorList extends LitElement {
       this.authorStartIndex + AUTHORS_PER_PAGE
     )) {
       authors = html`${authors}
-        <tr class="author-row">
+        <tr
+          class="author-row"
+          @click=${() => {
+            this.authorRowClicked(author);
+          }}
+        >
           <td class="icon">
             <div class="svg-icon person-icon">${unsafeHTML(iconPerson)}</div>
           </td>

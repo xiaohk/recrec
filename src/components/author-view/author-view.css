@@ -24,11 +24,15 @@
 }
 
 .profile-container {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 
   .profile-name {
+    border: 1px solid var(--gray-300);
+    border-radius: 5px;
+    padding: 5px 10px;
+
     &[is-unset] {
-      color: var(--gray-500);
+      color: var(--gray-600);
     }
   }
 }
@@ -73,4 +77,26 @@ button {
   &[is-hidden] {
     display: none;
   }
+}
+
+.svg-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 1em;
+  height: 1em;
+
+  color: currentColor;
+  transition: transform 80ms linear;
+  transform-origin: center;
+
+  & svg {
+    fill: currentColor;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.search-icon {
+  color: var(--gray-700);
 }

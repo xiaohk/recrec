@@ -4,7 +4,8 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { SlInput } from '@shoelace-style/shoelace';
 import type {
   SemanticAuthorSearchResponse,
-  SemanticAuthorSearch
+  SemanticAuthorSearch,
+  SemanticAuthorDetail
 } from '../../types/common-types';
 
 import '@shoelace-style/shoelace/dist/components/input/input.js';
@@ -13,6 +14,7 @@ import '../author-list/author-list';
 
 import '@shoelace-style/shoelace/dist/themes/light.css';
 import componentCSS from './author-view.css?inline';
+import iconSearch from '../../images/icon-search.svg?raw';
 
 /**
  * Author view element.
@@ -22,7 +24,7 @@ export class RecRecAuthorView extends LitElement {
   //==========================================================================||
   //                              Class Properties                            ||
   //==========================================================================||
-  profileName: string | null = null;
+  selectedProfile: SemanticAuthorDetail | null = null;
   searchAuthorTimer: number | null = null;
   lastCompletedQuery: string = '';
 
@@ -98,7 +100,9 @@ export class RecRecAuthorView extends LitElement {
   }
 
   searchBlurred() {
-    this.showAuthorList = false;
+    setTimeout(() => {
+      this.showAuthorList = false;
+    }, 200);
   }
 
   //==========================================================================||
@@ -132,6 +136,10 @@ export class RecRecAuthorView extends LitElement {
     console.log(data);
   }
 
+  authorRowClickedHandler(e: CustomEvent<SemanticAuthorDetail>) {
+    this.selectedProfile = e.detail;
+  }
+
   //==========================================================================||
   //                           Templates and Styles                           ||
   //==========================================================================||
@@ -141,8 +149,12 @@ export class RecRecAuthorView extends LitElement {
         <div class="content-container">
           <div class="profile-container">
             <span>My Profile:</span>
-            <span class="profile-name" ?is-unset=${this.profileName === null}
-              >${this.profileName || 'Unset'}</span
+            <span
+              class="profile-name"
+              ?is-unset=${this.selectedProfile === null}
+              >${this.selectedProfile === null
+                ? 'Unset'
+                : this.selectedProfile.name}</span
             >
           </div>
 
@@ -164,12 +176,18 @@ export class RecRecAuthorView extends LitElement {
                 this.searchBlurred();
               }}
             >
+              <div class="svg-icon search-icon" slot="prefix">
+                ${unsafeHTML(iconSearch)}
+              </div>
             </sl-input>
           </div>
 
           <div class="search-result" ?is-hidden=${!this.showAuthorList}>
             <recrec-author-list
               .authors=${this.searchAuthors}
+              @author-row-clicked=${(e: CustomEvent<SemanticAuthorDetail>) => {
+                this.authorRowClickedHandler(e);
+              }}
             ></recrec-author-list>
           </div>
         </div>
