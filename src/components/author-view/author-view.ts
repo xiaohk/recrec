@@ -1,6 +1,7 @@
 import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { SlInput } from '@shoelace-style/shoelace';
 import type {
   SemanticAuthorSearchResponse,
   SemanticAuthorSearch
@@ -27,6 +28,12 @@ export class RecRecAuthorView extends LitElement {
 
   @state()
   searchAuthors: SemanticAuthorSearch[] = [];
+
+  @state()
+  showAuthorList = false;
+
+  @query('sl-input')
+  searchInputComponent: SlInput | undefined;
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -59,6 +66,9 @@ export class RecRecAuthorView extends LitElement {
     const query = target.value;
 
     if (query === '') {
+      this.searchAuthors = [];
+      this.lastCompletedQuery = '';
+      this.showAuthorList = false;
       return;
     }
 
@@ -73,6 +83,22 @@ export class RecRecAuthorView extends LitElement {
         () => {}
       );
     }, delay);
+  }
+
+  searchFocused() {
+    // Show the author list if the query is not empty
+    if (this.searchInputComponent === undefined) {
+      return;
+    }
+
+    const query = this.searchInputComponent.value;
+    if (this.lastCompletedQuery === query) {
+      this.showAuthorList = true;
+    }
+  }
+
+  searchBlurred() {
+    this.showAuthorList = false;
   }
 
   //==========================================================================||
@@ -96,6 +122,12 @@ export class RecRecAuthorView extends LitElement {
     // Pass the author info to the author list component
     this.searchAuthors = data.data;
     this.lastCompletedQuery = query;
+
+    if (this.searchAuthors.length > 0) {
+      this.showAuthorList = true;
+    } else {
+      this.showAuthorList = false;
+    }
 
     console.log(data);
   }
@@ -125,10 +157,17 @@ export class RecRecAuthorView extends LitElement {
               @sl-change=${(e: InputEvent) => {
                 this.searchInput(e, 0);
               }}
-            ></sl-input>
+              @sl-focus=${() => {
+                this.searchFocused();
+              }}
+              @sl-blur=${() => {
+                this.searchBlurred();
+              }}
+            >
+            </sl-input>
           </div>
 
-          <div class="search-result">
+          <div class="search-result" ?is-hidden=${!this.showAuthorList}>
             <recrec-author-list
               .authors=${this.searchAuthors}
             ></recrec-author-list>

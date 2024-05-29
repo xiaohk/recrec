@@ -10,7 +10,7 @@ import type {
 import iconPerson from '../../images/icon-person.svg?raw';
 import componentCSS from './author-list.css?inline';
 
-const AUTHORS_PER_PAGE = 50;
+const AUTHORS_PER_PAGE = 100;
 
 /**
  * Author list element.
@@ -48,7 +48,10 @@ export class RecRecAuthorList extends LitElement {
     if (changedProperties.has('authors')) {
       // If the search authors have changed, we need to fetch the new details
       this.authorStartIndex = 0;
-      this.updateAuthorDetails();
+      this.updateAuthorDetails().then(
+        () => {},
+        () => {}
+      );
     }
   }
 
@@ -66,6 +69,7 @@ export class RecRecAuthorList extends LitElement {
   //==========================================================================||
   async updateAuthorDetails() {
     if (this.authors.length === 0) {
+      this.authorDetails = [];
       return;
     }
 

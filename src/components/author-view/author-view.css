@@ -67,4 +67,8 @@ button {
 
   border: 1px solid var(--gray-300);
   border-top: none;
+
+  &[is-hidden] {
+    display: none;
+  }
 }
