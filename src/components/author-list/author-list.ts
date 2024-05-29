@@ -120,7 +120,9 @@ export class RecRecAuthorList extends LitElement {
     )) {
       authors = html`${authors}
         <tr class="author-row">
-          <td class="svg-icon person-icon">${unsafeHTML(iconPerson)}</td>
+          <td class="icon">
+            <div class="svg-icon person-icon">${unsafeHTML(iconPerson)}</div>
+          </td>
           <td class="name">
             ${author.name}${author.affiliations.length > 0
               ? ` (${author.affiliations[0]})`

@@ -68,6 +68,8 @@ button {
   border: 1px solid var(--gray-300);
   border-top: none;
 
+  box-shadow: 0 2px 8px hsla(0, 0%, 0%, 0.08);
+
   &[is-hidden] {
     display: none;
   }

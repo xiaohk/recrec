@@ -17,6 +17,10 @@
   border-collapse: collapse;
   white-space: nowrap;
 
+  &:has(.author-row) {
+    margin-top: 10px;
+  }
+
   .col-icon {
     width: 0;
     min-width: min-content;
@@ -50,23 +54,35 @@
     }
 
     &:hover {
-      background-color: var(--blue-50);
+      background-color: var(--gray-50);
+    }
+
+    &:active {
+      background-color: var(--gray-100);
     }
   }
 
   & td {
     vertical-align: center;
-    padding: 2px 0;
+    padding: 3px 0;
+    height: 24px;
   }
 
-  .person-icon {
+  .icon {
     padding-left: calc(1rem - 2px);
     padding-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .name {
     padding-right: 50px;
     font-weight: 600;
+    max-width: 500px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .paper-count {

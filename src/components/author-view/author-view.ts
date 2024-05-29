@@ -61,7 +61,7 @@ export class RecRecAuthorView extends LitElement {
   //==========================================================================||
   //                              Event Handlers                              ||
   //==========================================================================||
-  searchInput(e: InputEvent, delay = 600) {
+  searchInput(e: InputEvent, delay = 400) {
     const target = e.currentTarget as HTMLInputElement;
     const query = target.value;
 
@@ -87,12 +87,12 @@ export class RecRecAuthorView extends LitElement {
 
   searchFocused() {
     // Show the author list if the query is not empty
-    if (this.searchInputComponent === undefined) {
+    if (!this.searchInputComponent) {
       return;
     }
 
     const query = this.searchInputComponent.value;
-    if (this.lastCompletedQuery === query) {
+    if (this.lastCompletedQuery === query && query !== '') {
       this.showAuthorList = true;
     }
   }
