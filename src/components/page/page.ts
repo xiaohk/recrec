@@ -1,7 +1,7 @@
 import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import '../app/app';
+import '../recrec/recrec';
 
 import componentCSS from './page.css?inline';
 

@@ -23,68 +23,6 @@
   flex-flow: column;
 }
 
-.profile-container {
-  margin-bottom: 15px;
-
-  .profile-name {
-    border: 1px solid var(--gray-300);
-    border-radius: 5px;
-    padding: 5px 10px;
-
-    &[is-unset] {
-      color: var(--gray-600);
-    }
-  }
-}
-
-.footer {
-  margin-top: 20px;
-  width: 100%;
-  display: flex;
-  flex-flow: row;
-  justify-content: flex-end;
-}
-
-button {
-  all: unset;
-}
-
-.confirm-button {
-  border-radius: 5px;
-  border: 1px solid var(--blue-600);
-  background: var(--blue-600);
-  color: white;
-  font-weight: 500;
-
-  padding: 8px 16px;
-  box-sizing: border-box;
-  position: relative;
-  cursor: pointer;
-
-  transition:
-    background linear 100ms,
-    border linear 100ms;
-
-  &:disabled {
-    cursor: no-drop;
-    border: 1px solid var(--gray-300);
-    color: var(--gray-700);
-    background: var(--gray-100);
-  }
-
-  &:not(:disabled) {
-    &:hover {
-      border: 1px solid color-mix(in lab, var(--blue-600), white 10%);
-      background-color: color-mix(in lab, var(--blue-600), white 10%);
-    }
-
-    &:active {
-      background: var(--blue-600);
-      border: 1px solid var(--blue-600);
-    }
-  }
-}
-
 .search-result {
   width: calc(100% - 4px);
   align-self: center;

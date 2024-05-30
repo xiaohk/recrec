@@ -1,11 +1,12 @@
 import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { Step } from '../../types/common-types';
+import { Step, SemanticAuthorDetail } from '../../types/common-types';
+
 import '../author-view/author-view';
 import '../paper-view/paper-view';
 
-import componentCSS from './app.css?inline';
+import componentCSS from './recrec.css?inline';
 
 const steps = [Step.Author, Step.Paper, Step.Recommender];
 
@@ -20,6 +21,9 @@ export class RecRecApp extends LitElement {
   //==========================================================================||
   @state()
   curStep: Step = Step.Author;
+
+  @state()
+  selectedProfile: SemanticAuthorDetail | null = null;
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -42,14 +46,17 @@ export class RecRecApp extends LitElement {
   //==========================================================================||
   //                              Event Handlers                              ||
   //==========================================================================||
+  authorRowClickedHandler(e: CustomEvent<SemanticAuthorDetail>) {
+    this.selectedProfile = e.detail;
+  }
 
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
-  moveToNextStep(curStep: Step) {
-    const curIndex = steps.indexOf(curStep);
+  moveToNextStep() {
+    const curIndex = steps.indexOf(this.curStep);
     if (curIndex + 1 >= steps.length) {
-      throw Error(`There is no more step after this step: ${curStep}`);
+      throw Error(`There is no more step after this step: ${this.curStep}`);
     }
     this.curStep = steps[curIndex + 1];
   }
@@ -58,24 +65,20 @@ export class RecRecApp extends LitElement {
   //                           Templates and Styles                           ||
   //==========================================================================||
   render() {
-    // Render the view based on the current step
+    // Render the content view based on the current step
     let contentView = html``;
     switch (this.curStep) {
       case Step.Author: {
         contentView = html`<recrec-author-view
-          @confirm-button-clicked=${() => {
-            this.moveToNextStep(Step.Author);
+          @author-row-clicked=${(e: CustomEvent<SemanticAuthorDetail>) => {
+            this.authorRowClickedHandler(e);
           }}
         ></recrec-author-view>`;
         break;
       }
 
       case Step.Paper: {
-        contentView = html`<recrec-paper-view
-          @confirm-button-clicked=${() => {
-            this.moveToNextStep(Step.Paper);
-          }}
-        ></recrec-paper-view>`;
+        contentView = html`<recrec-paper-view></recrec-paper-view>`;
         break;
       }
 
@@ -93,7 +96,29 @@ export class RecRecApp extends LitElement {
       <div class="app">
         <div class="view-container">
           <recrec-header-bar></recrec-header-bar>
-          ${contentView}
+
+          <div class="profile-container">
+            <span>My Profile:</span>
+            <span
+              class="profile-name"
+              ?is-unset=${this.selectedProfile === null}
+              >${this.selectedProfile === null
+                ? 'Unset'
+                : this.selectedProfile.name}</span
+            >
+          </div>
+
+          <div class="step-content-container">${contentView}</div>
+
+          <div class="footer">
+            <button
+              class="confirm-button"
+              ?disabled=${this.selectedProfile === null}
+              @click=${() => this.moveToNextStep()}
+            >
+              Confirm
+            </button>
+          </div>
         </div>
       </div>
     `;

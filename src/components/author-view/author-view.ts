@@ -105,19 +105,6 @@ export class RecRecAuthorView extends LitElement {
     }, 200);
   }
 
-  confirmButtonClicked() {
-    if (this.selectedProfile === null) {
-      return;
-    }
-
-    // Notify the parent to move to the next step
-    const event = new Event('confirm-button-clicked', {
-      bubbles: true,
-      composed: true
-    });
-    this.dispatchEvent(event);
-  }
-
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
@@ -160,17 +147,6 @@ export class RecRecAuthorView extends LitElement {
     return html`
       <div class="author-view">
         <div class="content-container">
-          <div class="profile-container">
-            <span>My Profile:</span>
-            <span
-              class="profile-name"
-              ?is-unset=${this.selectedProfile === null}
-              >${this.selectedProfile === null
-                ? 'Unset'
-                : this.selectedProfile.name}</span
-            >
-          </div>
-
           <div class="search-bar">
             <sl-input
               type="search"
@@ -203,16 +179,6 @@ export class RecRecAuthorView extends LitElement {
               }}
             ></recrec-author-list>
           </div>
-        </div>
-
-        <div class="footer">
-          <button
-            class="confirm-button"
-            ?disabled=${this.selectedProfile === null}
-            @click=${() => this.confirmButtonClicked()}
-          >
-            Confirm
-          </button>
         </div>
       </div>
     `;
