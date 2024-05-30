@@ -1,6 +1,7 @@
 import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { searchAuthorDetails } from '../../api/semantic-scholar';
 
 import type {
   SemanticAuthorSearch,
@@ -85,37 +86,8 @@ export class RecRecAuthorList extends LitElement {
       return;
     }
 
-    // Prepare for the fetch
-    const authorIDs = this.authors.map(d => d.authorId);
-    const body = {
-      ids: authorIDs
-    };
+    const data = await searchAuthorDetails(this.authors);
 
-    const baseURL = 'https://api.semanticscholar.org/graph/v1/author/batch';
-    const parameters: Record<string, string> = {
-      fields: 'authorId,name,affiliations,homepage,paperCount,citationCount'
-    };
-    const encodedParameters = new URLSearchParams(parameters);
-
-    const options: RequestInit = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    };
-
-    const url = `${baseURL}?${encodedParameters.toString()}`;
-
-    // Fetch the author details
-    const response = await fetch(url, options);
-    if (!response.ok) {
-      throw Error(
-        `Fetch error when getting author details, status: ${response.status}`
-      );
-    }
-
-    const data = (await response.json()) as SemanticAuthorDetail[];
     this.authorDetails = data;
   }
 

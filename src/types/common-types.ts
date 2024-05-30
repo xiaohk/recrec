@@ -15,6 +15,7 @@ export interface SemanticAuthorSearchResponse {
 }
 
 export interface SemanticAuthorDetail {
+  authorId: string;
   affiliations: string[];
   citationCount: number;
   homepage: string;

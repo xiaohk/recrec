@@ -23,8 +23,7 @@
 }
 
 .profile-container {
-  padding: var(--container-v-padding) var(--container-h-padding) 0px
-    var(--container-h-padding);
+  padding: var(--container-v-padding) var(--container-h-padding);
 
   .profile-name {
     border: 1px solid var(--gray-300);
@@ -93,7 +92,8 @@ button {
   flex: 1;
   min-height: 0px;
 
-  * {
+  .content-view {
     min-height: 0px;
+    height: 100%;
   }
 }

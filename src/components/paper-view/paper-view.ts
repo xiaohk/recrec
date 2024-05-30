@@ -34,7 +34,7 @@ export class RecRecPaperView extends LitElement {
   //==========================================================================||
   //                              Custom Methods                              ||
   //==========================================================================||
-  async initData() {};
+  async initData() {}
 
   //==========================================================================||
   //                              Event Handlers                              ||
@@ -48,8 +48,20 @@ export class RecRecPaperView extends LitElement {
   //                           Templates and Styles                           ||
   //==========================================================================||
   render() {
-    return html` <div class="paper-view">Paper view</div> `;
-  };
+    return html`
+      <div class="paper-view">
+        <table class="paper-table">
+          <thead>
+            <tr>
+              <td>Title</td>
+              <td>Cited By</td>
+              <td>Date</td>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    `;
+  }
 
   static styles = [
     css`

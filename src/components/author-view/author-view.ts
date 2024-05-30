@@ -2,6 +2,7 @@ import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { SlInput } from '@shoelace-style/shoelace';
+import { searchAuthorByName } from '../../api/semantic-scholar';
 import type {
   SemanticAuthorSearchResponse,
   SemanticAuthorSearch,
@@ -80,7 +81,7 @@ export class RecRecAuthorView extends LitElement {
     }
 
     this.searchAuthorTimer = setTimeout(() => {
-      this.searchAuthorByName(query).then(
+      this.updateAuthorList(query).then(
         () => {},
         () => {}
       );
@@ -108,20 +109,13 @@ export class RecRecAuthorView extends LitElement {
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
-  async searchAuthorByName(query: string) {
+  async updateAuthorList(query: string) {
     // Skip the query if it is the same as the last query
     if (query === this.lastCompletedQuery) {
       return;
     }
 
-    const baseURL = 'https://api.semanticscholar.org/graph/v1/author/search';
-    const url = `${baseURL}?query=${encodeURIComponent(query)}`;
-    const result = await fetch(url);
-    if (!result.ok) {
-      throw Error(`Search request failed with status: ${result.statusText}`);
-    }
-
-    const data = (await result.json()) as SemanticAuthorSearchResponse;
+    const data = await searchAuthorByName(query);
 
     // Pass the author info to the author list component
     this.searchAuthors = data.data;

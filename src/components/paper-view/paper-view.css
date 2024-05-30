@@ -1,6 +1,7 @@
 .paper-view {
   width: 100%;
   height: 100%;
+  padding: 0 var(--container-h-padding);
 
   display: flex;
   flex-direction: row;
@@ -8,4 +9,10 @@
   align-items: center;
 
   box-sizing: border-box;
+  background-color: var(--gray-100);
+}
+
+.paper-table {
+  width: 100%;
+  height: 100%;
 }

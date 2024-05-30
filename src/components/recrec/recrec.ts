@@ -20,7 +20,7 @@ export class RecRecApp extends LitElement {
   //                              Class Properties                            ||
   //==========================================================================||
   @state()
-  curStep: Step = Step.Author;
+  curStep: Step = Step.Paper;
 
   @state()
   selectedProfile: SemanticAuthorDetail | null = null;
@@ -30,6 +30,14 @@ export class RecRecApp extends LitElement {
   //==========================================================================||
   constructor() {
     super();
+    this.selectedProfile = {
+      authorId: '1390877819',
+      name: 'Zijie J. Wang',
+      affiliations: ['Georgia Tech'],
+      homepage: 'https://zijie.wang',
+      paperCount: 42,
+      citationCount: 1716
+    };
   }
 
   /**
@@ -70,6 +78,7 @@ export class RecRecApp extends LitElement {
     switch (this.curStep) {
       case Step.Author: {
         contentView = html`<recrec-author-view
+          class="content-view"
           @author-row-clicked=${(e: CustomEvent<SemanticAuthorDetail>) => {
             this.authorRowClickedHandler(e);
           }}
@@ -78,12 +87,16 @@ export class RecRecApp extends LitElement {
       }
 
       case Step.Paper: {
-        contentView = html`<recrec-paper-view></recrec-paper-view>`;
+        contentView = html`<recrec-paper-view
+          class="content-view"
+        ></recrec-paper-view>`;
         break;
       }
 
       case Step.Recommender: {
-        contentView = html`<recrec-author-view></recrec-author-view>`;
+        contentView = html`<recrec-author-view
+          class="content-view"
+        ></recrec-author-view>`;
         break;
       }
 
