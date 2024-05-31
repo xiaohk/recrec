@@ -24,6 +24,9 @@ export class RecRecPaperView extends LitElement {
   @state()
   papers: SemanticPaper[] = [];
 
+  @state()
+  selectedPaperIDs: Set<string> = new Set();
+
   //==========================================================================||
   //                             Lifecycle Methods                            ||
   //==========================================================================||
@@ -61,6 +64,29 @@ export class RecRecPaperView extends LitElement {
   //==========================================================================||
   //                              Event Handlers                              ||
   //==========================================================================||
+  paperCheckboxChanged(e: InputEvent, paperID: string) {
+    const checkboxElement = e.currentTarget as HTMLInputElement;
+    const newSelectedPaperIDs = structuredClone(this.selectedPaperIDs);
+    if (checkboxElement.checked) {
+      newSelectedPaperIDs.add(paperID);
+    } else {
+      newSelectedPaperIDs.delete(paperID);
+    }
+    this.selectedPaperIDs = newSelectedPaperIDs;
+  }
+
+  selectAllCheckboxChanged(e: InputEvent) {
+    const checkboxElement = e.currentTarget as HTMLInputElement;
+    if (checkboxElement.checked) {
+      const newSelectedPaperIDs = new Set<string>([
+        ...this.papers.map(d => d.paperId)
+      ]);
+      this.selectedPaperIDs = newSelectedPaperIDs;
+    } else {
+      const newSelectedPaperIDs = new Set<string>();
+      this.selectedPaperIDs = newSelectedPaperIDs;
+    }
+  }
 
   //==========================================================================||
   //                             Private Helpers                              ||
@@ -76,6 +102,13 @@ export class RecRecPaperView extends LitElement {
     // Sort the papers by publication date first
     papers.sort((a, b) => b.publicationDate.localeCompare(a.publicationDate));
     this.papers = papers;
+
+    // Select all papers by default
+    const newSelectedPaperIDs = new Set<string>([
+      ...papers.map(d => d.paperId)
+    ]);
+    this.selectedPaperIDs = newSelectedPaperIDs;
+
     console.log(this.papers);
   }
 
@@ -95,7 +128,14 @@ export class RecRecPaperView extends LitElement {
       tableBody = html`${tableBody}
         <tr>
           <td class="selected-cell">
-            <input type="checkbox" id="checkbox-${i}" />
+            <input
+              type="checkbox"
+              id="checkbox-${i}"
+              .checked=${this.selectedPaperIDs.has(paper.paperId)}
+              @change=${(e: InputEvent) => {
+                this.paperCheckboxChanged(e, paper.paperId);
+              }}
+            />
             <label for="checkbox-${i}"></label>
           </td>
           <td class="title-cell">
@@ -114,9 +154,14 @@ export class RecRecPaperView extends LitElement {
       <div class="paper-view">
         <table class="paper-table">
           <thead>
-            <tr>
+            <tr class="header-row">
               <th class="selected-cell header-cell">
-                <input class="paper-checkbox" type="checkbox" />
+                <input
+                  class="paper-checkbox"
+                  type="checkbox"
+                  .checked=${this.papers.length === this.selectedPaperIDs.size}
+                  @change=${(e: InputEvent) => this.selectAllCheckboxChanged(e)}
+                />
               </th>
               <th class="title-cell header-cell">
                 <button class="header-button">Title</button>
