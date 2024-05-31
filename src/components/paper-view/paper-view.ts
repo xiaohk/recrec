@@ -1,6 +1,12 @@
 import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import {
+  Step,
+  SemanticAuthorDetail,
+  SemanticPaper
+} from '../../types/common-types';
+import { getAllPapersFromAuthor } from '../../api/semantic-scholar';
 
 import componentCSS from './paper-view.css?inline';
 
@@ -12,6 +18,11 @@ export class RecRecPaperView extends LitElement {
   //==========================================================================||
   //                              Class Properties                            ||
   //==========================================================================||
+  @property({ attribute: false })
+  selectedProfile: SemanticAuthorDetail | null = null;
+
+  @state()
+  papers: SemanticPaper[] = [];
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -29,7 +40,18 @@ export class RecRecPaperView extends LitElement {
    * This method is called before new DOM is updated and rendered
    * @param changedProperties Property that has been changed
    */
-  willUpdate(changedProperties: PropertyValues<this>) {}
+  willUpdate(changedProperties: PropertyValues<this>) {
+    if (
+      changedProperties.has('selectedProfile') &&
+      this.selectedProfile !== null
+    ) {
+      // Update the paper information
+      this.updatePaperInfo().then(
+        () => {},
+        () => {}
+      );
+    }
+  }
 
   //==========================================================================||
   //                              Custom Methods                              ||
@@ -43,6 +65,15 @@ export class RecRecPaperView extends LitElement {
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
+  async updatePaperInfo() {
+    if (this.selectedProfile === null) {
+      console.error('Trying to update paper info when selectedProfile is null');
+      return;
+    }
+
+    this.papers = await getAllPapersFromAuthor(this.selectedProfile.authorId);
+    console.log(this.papers);
+  }
 
   //==========================================================================||
   //                           Templates and Styles                           ||

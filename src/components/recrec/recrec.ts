@@ -89,6 +89,7 @@ export class RecRecApp extends LitElement {
       case Step.Paper: {
         contentView = html`<recrec-paper-view
           class="content-view"
+          .selectedProfile=${this.selectedProfile}
         ></recrec-paper-view>`;
         break;
       }

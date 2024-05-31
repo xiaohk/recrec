@@ -1,7 +1,9 @@
 import type {
   SemanticAuthorSearchResponse,
   SemanticAuthorSearch,
-  SemanticAuthorDetail
+  SemanticAuthorDetail,
+  SemanticPaperSearchResponse,
+  SemanticPaper
 } from '../types/common-types';
 
 /**
@@ -65,4 +67,44 @@ export const searchAuthorDetails = async (
 
   const data = (await response.json()) as SemanticAuthorDetail[];
   return data;
+};
+
+export const getAllPapersFromAuthor = async (authorID: string) => {
+  // Prepare for the fetch
+  const baseURL = `https://api.semanticscholar.org/graph/v1/author/${authorID}/papers`;
+  let offset = 0;
+  let isComplete = false;
+  const papers: SemanticPaper[] = [];
+
+  while (!isComplete) {
+    const parameters: Record<string, string> = {
+      fields:
+        'corpusId,url,title,venue,publicationVenue,year,authors,externalIds,citationCount,publicationDate',
+      offset: String(offset)
+    };
+    const encodedParameters = new URLSearchParams(parameters);
+    const url = `${baseURL}?${encodedParameters.toString()}`;
+
+    // Fetch the paper details
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw Error(
+        `Fetch error when getting paper details, status: ${response.status}`
+      );
+    }
+
+    const data = (await response.json()) as SemanticPaperSearchResponse;
+
+    // Append the paper data
+    data.data.forEach(d => papers.push(d));
+
+    // Keep fetching until retrieving all the papers
+    if (data.next !== undefined) {
+      offset = data.next;
+    } else {
+      isComplete = true;
+    }
+  }
+
+  return papers;
 };

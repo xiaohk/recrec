@@ -2,6 +2,46 @@
  * Type definitions
  */
 
+export interface SemanticPaperSearchResponse {
+  offset: number;
+  next?: number;
+  data: SemanticPaper[];
+}
+
+export interface SemanticExternalIds {
+  DBLP?: string;
+  ArXiv?: string;
+  DOI?: string;
+  CorpusId: number;
+}
+
+export interface SemanticPublicationVenue {
+  id: string;
+  name: string;
+  type: string;
+  alternate_names: string[];
+  url: string;
+}
+
+export interface SemanticAuthor {
+  authorId: string;
+  name: string;
+}
+
+export interface SemanticPaper {
+  paperId: string;
+  externalIds: SemanticExternalIds;
+  corpusId: number;
+  publicationVenue: SemanticPublicationVenue;
+  url: string;
+  title: string;
+  venue: string;
+  year: number;
+  citationCount: number;
+  publicationDate: string;
+  authors: SemanticAuthor[];
+}
+
 export interface SemanticAuthorSearch {
   authorId: string;
   name: string;
