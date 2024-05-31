@@ -77,7 +77,7 @@ export class RecRecPaperView extends LitElement {
     ]);
     this.selectedPaperIDs = newSelectedPaperIDs;
 
-    this.notifyParentPaperCount(this.selectedPaperIDs.size);
+    this.notifyParentSelectedPapers(this.selectedPaperIDs);
 
     console.log(this.papers);
   }
@@ -85,15 +85,6 @@ export class RecRecPaperView extends LitElement {
   formatPaperAuthor(paper: SemanticPaper) {
     const authors = paper.authors.map(d => d.name).join(', ');
     return authors;
-  }
-
-  notifyParentPaperCount(paperCount: number) {
-    const event = new CustomEvent<number>('selected-paper-count-updated', {
-      bubbles: true,
-      composed: true,
-      detail: paperCount
-    });
-    this.dispatchEvent(event);
   }
 
   //==========================================================================||
@@ -109,7 +100,7 @@ export class RecRecPaperView extends LitElement {
     }
 
     this.selectedPaperIDs = newSelectedPaperIDs;
-    this.notifyParentPaperCount(this.selectedPaperIDs.size);
+    this.notifyParentSelectedPapers(this.selectedPaperIDs);
   }
 
   selectAllCheckboxChanged(e: InputEvent) {
@@ -124,7 +115,7 @@ export class RecRecPaperView extends LitElement {
       this.selectedPaperIDs = newSelectedPaperIDs;
     }
 
-    this.notifyParentPaperCount(this.selectedPaperIDs.size);
+    this.notifyParentSelectedPapers(this.selectedPaperIDs);
   }
 
   confirmButtonClicked() {
@@ -138,6 +129,14 @@ export class RecRecPaperView extends LitElement {
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
+  notifyParentSelectedPapers(selectedPaperIDs: Set<string>) {
+    const event = new CustomEvent<Set<string>>('selected-paper-count-updated', {
+      bubbles: true,
+      composed: true,
+      detail: selectedPaperIDs
+    });
+    this.dispatchEvent(event);
+  }
 
   //==========================================================================||
   //                           Templates and Styles                           ||

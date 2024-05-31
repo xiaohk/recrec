@@ -10,7 +10,7 @@ const steps = [Step.Author, Step.Paper, Step.Recommender];
 
 const titleString: Record<Step, string> = {
   [Step.Author]: 'Find Your Semantic Scholar Profile',
-  [Step.Paper]: 'Select Your Papers to Find Recommenders',
+  [Step.Paper]: 'Select Representative Papers',
   [Step.Recommender]: 'Refine the Potential Recommenders'
 };
 
@@ -22,11 +22,11 @@ export class RecRecHeaderBar extends LitElement {
   //==========================================================================||
   //                              Class Properties                            ||
   //==========================================================================||
-  @property({ type: Number })
-  curStepIndex = 0;
+  @property({ attribute: false })
+  curStep = Step.Author;
 
-  get curStep() {
-    return steps[this.curStepIndex];
+  get curStepIndex() {
+    return steps.indexOf(this.curStep);
   }
 
   //==========================================================================||

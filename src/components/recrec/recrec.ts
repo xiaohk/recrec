@@ -1,7 +1,11 @@
 import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { Step, SemanticAuthorDetail } from '../../types/common-types';
+import {
+  Step,
+  SemanticAuthorDetail,
+  SemanticPaper
+} from '../../types/common-types';
 import { RecRecPaperView } from '../paper-view/paper-view';
 
 import '../author-view/author-view';
@@ -30,7 +34,10 @@ export class RecRecApp extends LitElement {
   paperViewComponent!: RecRecPaperView;
 
   @state()
-  selectedPaperCount = 0;
+  papers: SemanticPaper[] = [];
+
+  @state()
+  selectedPaperIDs = new Set<string>();
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -65,8 +72,8 @@ export class RecRecApp extends LitElement {
     this.selectedProfile = e.detail;
   }
 
-  selectedPaperCountUpdatedHandler(e: CustomEvent<number>) {
-    this.selectedPaperCount = e.detail;
+  selectedPaperCountUpdatedHandler(e: CustomEvent<Set<string>>) {
+    this.selectedPaperIDs = e.detail;
   }
 
   //==========================================================================||
@@ -111,7 +118,7 @@ export class RecRecApp extends LitElement {
           @confirm-button-clicked=${() => {
             this.moveToNextStep();
           }}
-          @selected-paper-count-updated=${(e: CustomEvent<number>) => {
+          @selected-paper-count-updated=${(e: CustomEvent<Set<string>>) => {
             this.selectedPaperCountUpdatedHandler(e);
           }}
         ></recrec-paper-view>`;
@@ -133,7 +140,7 @@ export class RecRecApp extends LitElement {
     return html`
       <div class="app">
         <div class="view-container">
-          <recrec-header-bar></recrec-header-bar>
+          <recrec-header-bar .curStep=${this.curStep}></recrec-header-bar>
 
           <div class="info-bar">
             <div class="info-block">
@@ -150,7 +157,7 @@ export class RecRecApp extends LitElement {
             <div class="info-block" ?no-show=${this.curStep === Step.Author}>
               <span>Representative Papers:</span>
               <span class="profile-name"
-                >${this.selectedPaperCount} selected</span
+                >${this.selectedPaperIDs.size} selected</span
               >
             </div>
           </div>
