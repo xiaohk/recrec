@@ -78,6 +78,7 @@ export class RecRecPaperView extends LitElement {
     this.selectedPaperIDs = newSelectedPaperIDs;
 
     this.notifyParentSelectedPapers(this.selectedPaperIDs);
+    this.notifyParentPapers(this.papers);
 
     console.log(this.papers);
   }
@@ -134,6 +135,15 @@ export class RecRecPaperView extends LitElement {
       bubbles: true,
       composed: true,
       detail: selectedPaperIDs
+    });
+    this.dispatchEvent(event);
+  }
+
+  notifyParentPapers(papers: SemanticPaper[]) {
+    const event = new CustomEvent<SemanticPaper[]>('papers-updated', {
+      bubbles: true,
+      composed: true,
+      detail: papers
     });
     this.dispatchEvent(event);
   }

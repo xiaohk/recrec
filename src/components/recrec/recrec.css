@@ -28,6 +28,7 @@
   flex-flow: row;
   align-items: center;
   gap: 20px;
+  border-bottom: 1px solid var(--gray-300);
 
   .info-block {
     &[no-show] {
@@ -52,9 +53,16 @@
   width: 100%;
   flex: 1;
   min-height: 0px;
+  position: relative;
 
   .content-view {
     min-height: 0px;
+    position: absolute;
     height: 100%;
+    width: 100%;
+
+    &[no-show] {
+      display: none;
+    }
   }
 }

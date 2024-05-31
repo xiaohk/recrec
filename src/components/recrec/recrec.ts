@@ -10,6 +10,7 @@ import { RecRecPaperView } from '../paper-view/paper-view';
 
 import '../author-view/author-view';
 import '../paper-view/paper-view';
+import '../recommender-view/recommender-view';
 
 import componentCSS from './recrec.css?inline';
 
@@ -25,7 +26,7 @@ export class RecRecApp extends LitElement {
   //                              Class Properties                            ||
   //==========================================================================||
   @state()
-  curStep: Step = Step.Paper;
+  curStep: Step = Step.Recommender;
 
   @state()
   selectedProfile: SemanticAuthorDetail | null = null;
@@ -76,6 +77,21 @@ export class RecRecApp extends LitElement {
     this.selectedPaperIDs = e.detail;
   }
 
+  papersUpdatedHandler(e: CustomEvent<SemanticPaper[]>) {
+    this.papers = e.detail;
+  }
+
+  headerStepClickedHandler(e: CustomEvent<'pre' | 'next'>) {
+    const curStepIndex = steps.indexOf(this.curStep);
+    if (e.detail === 'pre') {
+      const newCurStepIndex = Math.max(0, curStepIndex - 1);
+      this.curStep = steps[newCurStepIndex];
+    } else {
+      const newCurStepIndex = Math.min(steps.length - 1, curStepIndex + 1);
+      this.curStep = steps[newCurStepIndex];
+    }
+  }
+
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
@@ -85,10 +101,6 @@ export class RecRecApp extends LitElement {
       throw Error(`There is no more step after this step: ${this.curStep}`);
     }
     this.curStep = steps[curIndex + 1];
-
-    if (this.curStep === Step.Recommender && this.paperViewComponent) {
-      console.log(this.paperViewComponent.selectedPaperIDs);
-    }
   }
 
   //==========================================================================||
@@ -96,51 +108,51 @@ export class RecRecApp extends LitElement {
   //==========================================================================||
   render() {
     // Render the content view based on the current step
-    let contentView = html``;
-    switch (this.curStep) {
-      case Step.Author: {
-        contentView = html`<recrec-author-view
-          class="content-view"
-          @author-row-clicked=${(e: CustomEvent<SemanticAuthorDetail>) => {
-            this.authorRowClickedHandler(e);
-          }}
-          @confirm-button-clicked=${() => {
-            this.moveToNextStep();
-          }}
-        ></recrec-author-view>`;
-        break;
-      }
+    const contentView = html`
+      <recrec-author-view
+        class="content-view"
+        ?no-show=${this.curStep !== Step.Author}
+        @author-row-clicked=${(e: CustomEvent<SemanticAuthorDetail>) => {
+          this.authorRowClickedHandler(e);
+        }}
+        @confirm-button-clicked=${() => {
+          this.moveToNextStep();
+        }}
+      ></recrec-author-view>
 
-      case Step.Paper: {
-        contentView = html`<recrec-paper-view
-          class="content-view"
-          .selectedProfile=${this.selectedProfile}
-          @confirm-button-clicked=${() => {
-            this.moveToNextStep();
-          }}
-          @selected-paper-count-updated=${(e: CustomEvent<Set<string>>) => {
-            this.selectedPaperCountUpdatedHandler(e);
-          }}
-        ></recrec-paper-view>`;
-        break;
-      }
+      <recrec-paper-view
+        class="content-view"
+        ?no-show=${this.curStep !== Step.Paper}
+        .selectedProfile=${this.selectedProfile}
+        @confirm-button-clicked=${() => {
+          this.moveToNextStep();
+        }}
+        @selected-paper-count-updated=${(e: CustomEvent<Set<string>>) => {
+          this.selectedPaperCountUpdatedHandler(e);
+        }}
+        @papers-updated=${(e: CustomEvent<SemanticPaper[]>) => {
+          this.papersUpdatedHandler(e);
+        }}
+      ></recrec-paper-view>
 
-      case Step.Recommender: {
-        contentView = html`<recrec-author-view
-          class="content-view"
-        ></recrec-author-view>`;
-        break;
-      }
-
-      default: {
-        break;
-      }
-    }
+      <recrec-recommender-view
+        class="content-view"
+        ?no-show=${this.curStep !== Step.Recommender}
+        .papers=${this.papers}
+        .selectedPaperIDs=${this.selectedPaperIDs}
+        .selectedProfile=${this.selectedProfile}
+      ></recrec-recommender-view>
+    `;
 
     return html`
       <div class="app">
         <div class="view-container">
-          <recrec-header-bar .curStep=${this.curStep}></recrec-header-bar>
+          <recrec-header-bar
+            .curStep=${this.curStep}
+            @step-clicked=${(e: CustomEvent<'pre' | 'next'>) => {
+              this.headerStepClickedHandler(e);
+            }}
+          ></recrec-header-bar>
 
           <div class="info-bar">
             <div class="info-block">

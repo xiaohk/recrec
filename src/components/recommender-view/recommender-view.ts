@@ -1,33 +1,26 @@
 import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { Step } from '../../types/common-types';
+import { SemanticAuthorDetail, SemanticPaper } from '../../types/common-types';
 
-import iconCaret from '../../images/icon-caret-down.svg?raw';
-import componentCSS from './header-bar.css?inline';
-
-const steps = [Step.Author, Step.Paper, Step.Recommender];
-
-const titleString: Record<Step, string> = {
-  [Step.Author]: 'Find Your Semantic Scholar Profile',
-  [Step.Paper]: 'Select Representative Papers',
-  [Step.Recommender]: 'Refine the Potential Recommenders'
-};
+import componentCSS from './recommender-view.css?inline';
 
 /**
- * Header bar element.
+ * Recommender view element.
  */
-@customElement('recrec-header-bar')
-export class RecRecHeaderBar extends LitElement {
+@customElement('recrec-recommender-view')
+export class RecRecRecommenderView extends LitElement {
   //==========================================================================||
   //                              Class Properties                            ||
   //==========================================================================||
   @property({ attribute: false })
-  curStep = Step.Author;
+  selectedProfile: SemanticAuthorDetail | null = null;
 
-  get curStepIndex() {
-    return steps.indexOf(this.curStep);
-  }
+  @property({ attribute: false })
+  papers: SemanticPaper[] = [];
+
+  @property({ attribute: false })
+  selectedPaperIDs = new Set<string>();
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -52,15 +45,6 @@ export class RecRecHeaderBar extends LitElement {
   //==========================================================================||
   async initData() {}
 
-  notifyParentMoveStep(direction: 'pre' | 'next') {
-    const event = new CustomEvent<'pre' | 'next'>('step-clicked', {
-      bubbles: true,
-      composed: true,
-      detail: direction
-    });
-    this.dispatchEvent(event);
-  }
-
   //==========================================================================||
   //                              Event Handlers                              ||
   //==========================================================================||
@@ -73,33 +57,7 @@ export class RecRecHeaderBar extends LitElement {
   //                           Templates and Styles                           ||
   //==========================================================================||
   render() {
-    return html`
-      <div class="header-bar">
-        <button
-          class="svg-icon move-pre"
-          @click=${() => {
-            this.notifyParentMoveStep('pre');
-          }}
-        >
-          ${unsafeHTML(iconCaret)}
-        </button>
-        <div class="title-middle">
-          <span class="step-info"
-            >Step ${this.curStepIndex + 1}/${steps.length}:</span
-          >
-          <span class="title">${titleString[this.curStep]}</span>
-        </div>
-
-        <button
-          class="svg-icon move-next"
-          @click=${() => {
-            this.notifyParentMoveStep('next');
-          }}
-        >
-          ${unsafeHTML(iconCaret)}
-        </button>
-      </div>
-    `;
+    return html` <div class="recommender-view">${this.papers.length}</div> `;
   }
 
   static styles = [
@@ -111,6 +69,6 @@ export class RecRecHeaderBar extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'recrec-header-bar': RecRecHeaderBar;
+    'recrec-recommender-view': RecRecRecommenderView;
   }
 }
