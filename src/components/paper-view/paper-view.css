@@ -1,15 +1,21 @@
 .paper-view {
   width: 100%;
   height: 100%;
-  overflow-y: auto;
   padding: 0;
 
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: flex-start;
 
   box-sizing: border-box;
+}
+
+.table-container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+
   border: 1px solid var(--gray-300);
   border-left: none;
   border-right: none;
@@ -135,5 +141,54 @@ button.header-button {
 
   &:active {
     color: var(--indigo-900);
+  }
+}
+
+.footer {
+  box-sizing: border-box;
+  padding: var(--container-v-padding) var(--container-h-padding);
+  width: 100%;
+  display: flex;
+  flex-flow: row;
+  justify-content: flex-end;
+}
+
+button {
+  all: unset;
+}
+
+.confirm-button {
+  border-radius: 5px;
+  border: 1px solid var(--blue-600);
+  background: var(--blue-600);
+  color: white;
+  font-weight: 500;
+
+  padding: 8px 16px;
+  box-sizing: border-box;
+  position: relative;
+  cursor: pointer;
+
+  transition:
+    background linear 100ms,
+    border linear 100ms;
+
+  &:disabled {
+    cursor: no-drop;
+    border: 1px solid var(--gray-300);
+    color: var(--gray-600);
+    background: var(--gray-100);
+  }
+
+  &:not(:disabled) {
+    &:hover {
+      border: 1px solid color-mix(in lab, var(--blue-600), white 10%);
+      background-color: color-mix(in lab, var(--blue-600), white 10%);
+    }
+
+    &:active {
+      background: var(--blue-600);
+      border: 1px solid var(--blue-600);
+    }
   }
 }

@@ -59,38 +59,6 @@ export class RecRecPaperView extends LitElement {
   //==========================================================================||
   //                              Custom Methods                              ||
   //==========================================================================||
-  async initData() {}
-
-  //==========================================================================||
-  //                              Event Handlers                              ||
-  //==========================================================================||
-  paperCheckboxChanged(e: InputEvent, paperID: string) {
-    const checkboxElement = e.currentTarget as HTMLInputElement;
-    const newSelectedPaperIDs = structuredClone(this.selectedPaperIDs);
-    if (checkboxElement.checked) {
-      newSelectedPaperIDs.add(paperID);
-    } else {
-      newSelectedPaperIDs.delete(paperID);
-    }
-    this.selectedPaperIDs = newSelectedPaperIDs;
-  }
-
-  selectAllCheckboxChanged(e: InputEvent) {
-    const checkboxElement = e.currentTarget as HTMLInputElement;
-    if (checkboxElement.checked) {
-      const newSelectedPaperIDs = new Set<string>([
-        ...this.papers.map(d => d.paperId)
-      ]);
-      this.selectedPaperIDs = newSelectedPaperIDs;
-    } else {
-      const newSelectedPaperIDs = new Set<string>();
-      this.selectedPaperIDs = newSelectedPaperIDs;
-    }
-  }
-
-  //==========================================================================||
-  //                             Private Helpers                              ||
-  //==========================================================================||
   async updatePaperInfo() {
     if (this.selectedProfile === null) {
       console.error('Trying to update paper info when selectedProfile is null');
@@ -109,6 +77,8 @@ export class RecRecPaperView extends LitElement {
     ]);
     this.selectedPaperIDs = newSelectedPaperIDs;
 
+    this.notifyParentPaperCount(this.selectedPaperIDs.size);
+
     console.log(this.papers);
   }
 
@@ -116,6 +86,58 @@ export class RecRecPaperView extends LitElement {
     const authors = paper.authors.map(d => d.name).join(', ');
     return authors;
   }
+
+  notifyParentPaperCount(paperCount: number) {
+    const event = new CustomEvent<number>('selected-paper-count-updated', {
+      bubbles: true,
+      composed: true,
+      detail: paperCount
+    });
+    this.dispatchEvent(event);
+  }
+
+  //==========================================================================||
+  //                              Event Handlers                              ||
+  //==========================================================================||
+  paperCheckboxChanged(e: InputEvent, paperID: string) {
+    const checkboxElement = e.currentTarget as HTMLInputElement;
+    const newSelectedPaperIDs = structuredClone(this.selectedPaperIDs);
+    if (checkboxElement.checked) {
+      newSelectedPaperIDs.add(paperID);
+    } else {
+      newSelectedPaperIDs.delete(paperID);
+    }
+
+    this.selectedPaperIDs = newSelectedPaperIDs;
+    this.notifyParentPaperCount(this.selectedPaperIDs.size);
+  }
+
+  selectAllCheckboxChanged(e: InputEvent) {
+    const checkboxElement = e.currentTarget as HTMLInputElement;
+    if (checkboxElement.checked) {
+      const newSelectedPaperIDs = new Set<string>([
+        ...this.papers.map(d => d.paperId)
+      ]);
+      this.selectedPaperIDs = newSelectedPaperIDs;
+    } else {
+      const newSelectedPaperIDs = new Set<string>();
+      this.selectedPaperIDs = newSelectedPaperIDs;
+    }
+
+    this.notifyParentPaperCount(this.selectedPaperIDs.size);
+  }
+
+  confirmButtonClicked() {
+    const event = new Event('confirm-button-clicked', {
+      bubbles: true,
+      composed: true
+    });
+    this.dispatchEvent(event);
+  }
+
+  //==========================================================================||
+  //                             Private Helpers                              ||
+  //==========================================================================||
 
   //==========================================================================||
   //                           Templates and Styles                           ||
@@ -152,33 +174,47 @@ export class RecRecPaperView extends LitElement {
 
     return html`
       <div class="paper-view">
-        <table class="paper-table">
-          <thead>
-            <tr class="header-row">
-              <th class="selected-cell header-cell">
-                <input
-                  class="paper-checkbox"
-                  type="checkbox"
-                  .checked=${this.papers.length === this.selectedPaperIDs.size}
-                  @change=${(e: InputEvent) => this.selectAllCheckboxChanged(e)}
-                />
-              </th>
-              <th class="title-cell header-cell">
-                <button class="header-button">Title</button>
-              </th>
-              <th class="citation-cell header-cell">
-                <button class="header-button">Cited By</button>
-              </th>
-              <th class="date-cell header-cell">
-                <button class="header-button">Year</button>
-              </th>
-            </tr>
-          </thead>
+        <div class="table-container">
+          <table class="paper-table">
+            <thead>
+              <tr class="header-row">
+                <th class="selected-cell header-cell">
+                  <input
+                    class="paper-checkbox"
+                    type="checkbox"
+                    .checked=${this.papers.length ===
+                    this.selectedPaperIDs.size}
+                    @change=${(e: InputEvent) =>
+                      this.selectAllCheckboxChanged(e)}
+                  />
+                </th>
+                <th class="title-cell header-cell">
+                  <button class="header-button">Title</button>
+                </th>
+                <th class="citation-cell header-cell">
+                  <button class="header-button">Cited By</button>
+                </th>
+                <th class="date-cell header-cell">
+                  <button class="header-button">Year</button>
+                </th>
+              </tr>
+            </thead>
 
-          <tbody>
-            ${tableBody}
-          </tbody>
-        </table>
+            <tbody>
+              ${tableBody}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="footer">
+          <button
+            class="confirm-button"
+            ?disabled=${this.selectedPaperIDs.size === 0}
+            @click=${() => this.confirmButtonClicked()}
+          >
+            Confirm
+          </button>
+        </div>
       </div>
     `;
   }

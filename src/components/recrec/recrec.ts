@@ -2,6 +2,7 @@ import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { Step, SemanticAuthorDetail } from '../../types/common-types';
+import { RecRecPaperView } from '../paper-view/paper-view';
 
 import '../author-view/author-view';
 import '../paper-view/paper-view';
@@ -24,6 +25,12 @@ export class RecRecApp extends LitElement {
 
   @state()
   selectedProfile: SemanticAuthorDetail | null = null;
+
+  @query('recrec-paper-view')
+  paperViewComponent!: RecRecPaperView;
+
+  @state()
+  selectedPaperCount = 0;
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -58,6 +65,10 @@ export class RecRecApp extends LitElement {
     this.selectedProfile = e.detail;
   }
 
+  selectedPaperCountUpdatedHandler(e: CustomEvent<number>) {
+    this.selectedPaperCount = e.detail;
+  }
+
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
@@ -67,6 +78,10 @@ export class RecRecApp extends LitElement {
       throw Error(`There is no more step after this step: ${this.curStep}`);
     }
     this.curStep = steps[curIndex + 1];
+
+    if (this.curStep === Step.Recommender && this.paperViewComponent) {
+      console.log(this.paperViewComponent.selectedPaperIDs);
+    }
   }
 
   //==========================================================================||
@@ -82,6 +97,9 @@ export class RecRecApp extends LitElement {
           @author-row-clicked=${(e: CustomEvent<SemanticAuthorDetail>) => {
             this.authorRowClickedHandler(e);
           }}
+          @confirm-button-clicked=${() => {
+            this.moveToNextStep();
+          }}
         ></recrec-author-view>`;
         break;
       }
@@ -90,6 +108,12 @@ export class RecRecApp extends LitElement {
         contentView = html`<recrec-paper-view
           class="content-view"
           .selectedProfile=${this.selectedProfile}
+          @confirm-button-clicked=${() => {
+            this.moveToNextStep();
+          }}
+          @selected-paper-count-updated=${(e: CustomEvent<number>) => {
+            this.selectedPaperCountUpdatedHandler(e);
+          }}
         ></recrec-paper-view>`;
         break;
       }
@@ -111,28 +135,27 @@ export class RecRecApp extends LitElement {
         <div class="view-container">
           <recrec-header-bar></recrec-header-bar>
 
-          <div class="profile-container">
-            <span>My Profile:</span>
-            <span
-              class="profile-name"
-              ?is-unset=${this.selectedProfile === null}
-              >${this.selectedProfile === null
-                ? 'Unset'
-                : this.selectedProfile.name}</span
-            >
+          <div class="info-bar">
+            <div class="info-block">
+              <span>My Profile:</span>
+              <span
+                class="profile-name"
+                ?is-unset=${this.selectedProfile === null}
+                >${this.selectedProfile === null
+                  ? 'Unset'
+                  : this.selectedProfile.name}</span
+              >
+            </div>
+
+            <div class="info-block" ?no-show=${this.curStep === Step.Author}>
+              <span>Representative Papers:</span>
+              <span class="profile-name"
+                >${this.selectedPaperCount} selected</span
+              >
+            </div>
           </div>
 
           <div class="step-content-container">${contentView}</div>
-
-          <div class="footer">
-            <button
-              class="confirm-button"
-              ?disabled=${this.selectedProfile === null}
-              @click=${() => this.moveToNextStep()}
-            >
-              Confirm
-            </button>
-          </div>
         </div>
       </div>
     `;
