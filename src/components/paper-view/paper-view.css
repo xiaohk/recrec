@@ -26,7 +26,8 @@
   --table-h-padding: 30px;
 
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   empty-cells: show;
   line-height: 1.24;
   margin-bottom: 10px;
@@ -35,7 +36,7 @@
   & thead {
     position: sticky;
     top: 0;
-    background: var(--gray-100);
+    background: white;
     z-index: 2;
   }
 
@@ -107,7 +108,7 @@
 
   & th {
     white-space: nowrap;
-    font-weight: 400;
+    border-bottom: 1px solid var(--gray-300);
 
     &.header-cell {
       padding-top: 12px;

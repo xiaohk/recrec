@@ -2,6 +2,21 @@
  * Type definitions
  */
 
+export interface SemanticCitationAuthor {
+  authorId: string;
+  name: string;
+}
+
+export interface SemanticCitation {
+  paperId: string;
+  authors: SemanticCitationAuthor[];
+}
+
+export interface SemanticPaperCitationDetail {
+  paperId: string;
+  citations: SemanticCitation[];
+}
+
 export interface SemanticPaperSearchResponse {
   offset: number;
   next?: number;

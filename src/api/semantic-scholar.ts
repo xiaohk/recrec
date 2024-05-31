@@ -3,7 +3,8 @@ import type {
   SemanticAuthorSearch,
   SemanticAuthorDetail,
   SemanticPaperSearchResponse,
-  SemanticPaper
+  SemanticPaper,
+  SemanticPaperCitationDetail
 } from '../types/common-types';
 
 import paperSearchMockJSON from '../../test/api-responses/paper-search.json';
@@ -116,4 +117,38 @@ export const getAllPapersFromAuthor = async (authorID: string) => {
   }
 
   return papers;
+};
+
+export const getPaperCitations = async (paperIDs: string[]) => {
+  // Prepare for the fetch
+  const body = {
+    ids: paperIDs
+  };
+
+  const baseURL = 'https://api.semanticscholar.org/graph/v1/paper/batch';
+  const parameters: Record<string, string> = {
+    fields: 'paperId,citations.authors'
+  };
+  const encodedParameters = new URLSearchParams(parameters);
+
+  const options: RequestInit = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  };
+
+  const url = `${baseURL}?${encodedParameters.toString()}`;
+
+  // Fetch the author details
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    throw Error(
+      `Fetch error when getting author details, status: ${response.status}`
+    );
+  }
+
+  const data = (await response.json()) as SemanticPaperCitationDetail[];
+  return data;
 };

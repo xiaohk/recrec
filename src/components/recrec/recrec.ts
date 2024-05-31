@@ -138,6 +138,7 @@ export class RecRecApp extends LitElement {
       <recrec-recommender-view
         class="content-view"
         ?no-show=${this.curStep !== Step.Recommender}
+        .curStep=${this.curStep}
         .papers=${this.papers}
         .selectedPaperIDs=${this.selectedPaperIDs}
         .selectedProfile=${this.selectedProfile}
