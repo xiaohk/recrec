@@ -71,24 +71,68 @@ export class RecRecPaperView extends LitElement {
       return;
     }
 
-    this.papers = await getAllPapersFromAuthor(this.selectedProfile.authorId);
+    const papers = await getAllPapersFromAuthor(this.selectedProfile.authorId);
+
+    // Sort the papers by publication date first
+    papers.sort((a, b) => b.publicationDate.localeCompare(a.publicationDate));
+    this.papers = papers;
     console.log(this.papers);
+  }
+
+  formatPaperAuthor(paper: SemanticPaper) {
+    const authors = paper.authors.map(d => d.name).join(', ');
+    return authors;
   }
 
   //==========================================================================||
   //                           Templates and Styles                           ||
   //==========================================================================||
   render() {
+    // Compile the table content
+    let tableBody = html``;
+
+    for (const [i, paper] of this.papers.entries()) {
+      tableBody = html`${tableBody}
+        <tr>
+          <td class="selected-cell">
+            <input type="checkbox" id="checkbox-${i}" />
+            <label for="checkbox-${i}"></label>
+          </td>
+          <td class="title-cell">
+            <span class="title">${paper.title}</span>
+            <span class="author" title=${this.formatPaperAuthor(paper)}
+              >${this.formatPaperAuthor(paper)}</span
+            >
+            <span class="venue">${paper.venue}</span>
+          </td>
+          <td class="citation-cell">${paper.citationCount}</td>
+          <td class="date-cell">${paper.year}</td>
+        </tr> `;
+    }
+
     return html`
       <div class="paper-view">
         <table class="paper-table">
           <thead>
             <tr>
-              <td>Title</td>
-              <td>Cited By</td>
-              <td>Date</td>
+              <th class="selected-cell header-cell">
+                <input class="paper-checkbox" type="checkbox" />
+              </th>
+              <th class="title-cell header-cell">
+                <button class="header-button">Title</button>
+              </th>
+              <th class="citation-cell header-cell">
+                <button class="header-button">Cited By</button>
+              </th>
+              <th class="date-cell header-cell">
+                <button class="header-button">Year</button>
+              </th>
             </tr>
           </thead>
+
+          <tbody>
+            ${tableBody}
+          </tbody>
         </table>
       </div>
     `;

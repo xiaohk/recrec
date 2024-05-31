@@ -6,6 +6,11 @@ import type {
   SemanticPaper
 } from '../types/common-types';
 
+import paperSearchMockJSON from '../../test/api-responses/paper-search.json';
+
+const paperSearchMock = paperSearchMockJSON as SemanticPaperSearchResponse;
+const MOCK_HTTP_CALL = true;
+
 /**
  * Searches for an author by name using the Semantic Scholar API.
  * @param query - The name of the author to search for.
@@ -70,6 +75,10 @@ export const searchAuthorDetails = async (
 };
 
 export const getAllPapersFromAuthor = async (authorID: string) => {
+  if (MOCK_HTTP_CALL) {
+    return paperSearchMock.data;
+  }
+
   // Prepare for the fetch
   const baseURL = `https://api.semanticscholar.org/graph/v1/author/${authorID}/papers`;
   let offset = 0;

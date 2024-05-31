@@ -1,18 +1,138 @@
 .paper-view {
   width: 100%;
   height: 100%;
-  padding: 0 var(--container-h-padding);
+  overflow-y: auto;
+  padding: 0;
 
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 
   box-sizing: border-box;
-  background-color: var(--gray-100);
+  border: 1px solid var(--gray-300);
+  border-left: none;
+  border-right: none;
 }
 
 .paper-table {
+  --table-v-padding: 13px;
+  --table-h-padding: 30px;
+
   width: 100%;
-  height: 100%;
+  border-collapse: collapse;
+  empty-cells: show;
+  line-height: 1.24;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+
+  & thead {
+    position: sticky;
+    top: 0;
+    background: var(--gray-100);
+    z-index: 2;
+  }
+
+  .selected-cell {
+    position: relative;
+    vertical-align: top;
+    padding: var(--table-v-padding) var(--table-h-padding) 0
+      var(--container-h-padding);
+
+    & input[type='checkbox'] {
+      position: relative;
+      margin: 0;
+      z-index: 1;
+    }
+
+    & label {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      transform: translateX(-60%);
+    }
+  }
+
+  .title-cell {
+    vertical-align: top;
+    text-align: left;
+    padding: var(--table-v-padding) var(--table-h-padding) 0 0;
+
+    display: flex;
+    flex-flow: column nowrap;
+
+    .title {
+      font-weight: 500;
+    }
+
+    .author {
+      font-size: var(--font-d3);
+
+      max-width: 600px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .venue {
+      font-size: var(--font-d3);
+
+      max-width: 600px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .citation-cell {
+    vertical-align: top;
+    text-align: right;
+    padding: var(--table-v-padding) var(--table-h-padding) 0 0;
+    width: 30px;
+    font-size: var(--font-d1);
+  }
+
+  .date-cell {
+    vertical-align: top;
+    text-align: right;
+    padding: var(--table-v-padding) var(--container-h-padding) 0 0;
+    font-size: var(--font-d1);
+  }
+
+  & th {
+    white-space: nowrap;
+    font-weight: 400;
+
+    &.header-cell {
+      padding-top: 12px;
+      padding-bottom: 12px;
+
+      &:first-child {
+        padding-left: var(--container-h-padding);
+      }
+
+      &:last-child {
+        padding-right: var(--container-h-padding);
+      }
+    }
+  }
+}
+
+button {
+  all: unset;
+}
+
+button.header-button {
+  color: var(--indigo-600);
+  cursor: pointer;
+  width: min-content;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:active {
+    color: var(--indigo-900);
+  }
 }
