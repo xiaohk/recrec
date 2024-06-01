@@ -9,10 +9,16 @@ import {
   SemanticAuthorDetail,
   SemanticPaper,
   SemanticPaperCitationDetail,
-  SemanticCitation
+  SemanticCitationAuthor
 } from '../../types/common-types';
 
 import componentCSS from './recommender-view.css?inline';
+
+interface Recommender {
+  authorID: string;
+  name: string;
+  affiliation?: string;
+}
 
 /**
  * Recommender view element.
@@ -35,6 +41,12 @@ export class RecRecRecommenderView extends LitElement {
   selectedPaperIDs = new Set<string>();
 
   lastSelectedPaperIDs = new Set<string>();
+
+  citationAuthorCount = new Map<string, number>();
+  authorIDMap = new Map<string, string>();
+
+  @state()
+  recommenders: Recommender[] = [];
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -59,6 +71,14 @@ export class RecRecRecommenderView extends LitElement {
         () => {}
       );
     }
+
+    // TODO: Remove this after developing this component
+    if (changedProperties.has('selectedPaperIDs')) {
+      this.updateCitations().then(
+        () => {},
+        () => {}
+      );
+    }
   }
 
   //==========================================================================||
@@ -72,9 +92,56 @@ export class RecRecRecommenderView extends LitElement {
       return;
     }
 
-    console.time('citation');
-    const data = await getPaperCitations([...this.selectedPaperIDs]);
-    console.timeEnd('citation');
+    console.time('Query citations');
+    const paperCitations = await getPaperCitations([...this.selectedPaperIDs]);
+    console.timeEnd('Query citations');
+
+    // Count the authors in the citations
+    const citationAuthorCount = new Map<string, number>();
+
+    for (const paper of paperCitations) {
+      for (const citation of paper.citations) {
+        for (const author of citation.authors) {
+          // Update count
+          if (citationAuthorCount.has(author.authorId)) {
+            const oldCount = citationAuthorCount.get(author.authorId)!;
+            citationAuthorCount.set(author.authorId, oldCount + 1);
+          } else {
+            citationAuthorCount.set(author.authorId, 1);
+          }
+
+          // Update ID map
+          if (!this.authorIDMap.has(author.authorId)) {
+            this.authorIDMap.set(author.authorId, author.name);
+          }
+        }
+      }
+    }
+
+    this.citationAuthorCount = citationAuthorCount;
+
+    // Update the view
+    this.updateCitationView();
+  }
+
+  updateCitationView() {
+    // Filter authors citing at least 2 times and sort them based on count
+    const citationCounts = [...this.citationAuthorCount.entries()]
+      .filter(d => d[1] > 1 && d[0] != null)
+      .sort((a, b) => b[1] - a[1]);
+
+    // Get the top authors
+    const recommenders: Recommender[] = [];
+
+    for (const [author, _] of citationCounts.slice(0, 100)) {
+      const recommender: Recommender = {
+        authorID: author,
+        name: this.authorIDMap.get(author)!
+      };
+      recommenders.push(recommender);
+    }
+    this.recommenders = recommenders;
+    console.log(citationCounts);
   }
 
   //==========================================================================||
@@ -89,7 +156,15 @@ export class RecRecRecommenderView extends LitElement {
   //                           Templates and Styles                           ||
   //==========================================================================||
   render() {
-    return html` <div class="recommender-view">${this.papers.length}</div> `;
+    // Compile the recommenders
+    let recommenderView = html``;
+
+    for (const recommender of this.recommenders) {
+      recommenderView = html`${recommenderView}
+        <div class="recommender-card">${recommender.name}</div> `;
+    }
+
+    return html` <div class="recommender-view">${recommenderView}</div> `;
   }
 
   static styles = [

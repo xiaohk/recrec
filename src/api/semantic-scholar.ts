@@ -8,9 +8,12 @@ import type {
 } from '../types/common-types';
 
 import paperSearchMockJSON from '../../test/api-responses/paper-search.json';
+import citationSearchMockJSON from '../../test/api-responses/citation-search.json';
 
-const paperSearchMock = paperSearchMockJSON as SemanticPaperSearchResponse;
 const MOCK_HTTP_CALL = true;
+const paperSearchMock = paperSearchMockJSON as SemanticPaperSearchResponse;
+const citationSearchMock =
+  citationSearchMockJSON as SemanticPaperCitationDetail[];
 
 /**
  * Searches for an author by name using the Semantic Scholar API.
@@ -120,6 +123,10 @@ export const getAllPapersFromAuthor = async (authorID: string) => {
 };
 
 export const getPaperCitations = async (paperIDs: string[]) => {
+  if (MOCK_HTTP_CALL) {
+    return citationSearchMock;
+  }
+
   // Prepare for the fetch
   const body = {
     ids: paperIDs

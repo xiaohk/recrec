@@ -22,7 +22,7 @@
 }
 
 .paper-table {
-  --table-v-padding: 13px;
+  --table-v-padding: 11px;
   --table-h-padding: 30px;
 
   width: 100%;
@@ -106,21 +106,23 @@
     font-size: var(--font-d2);
   }
 
-  & th {
-    white-space: nowrap;
-    border-bottom: 1px solid var(--gray-300);
+  .header-row {
+    & th {
+      white-space: nowrap;
+      border-bottom: 1px solid var(--gray-300);
 
-    &.header-cell {
-      padding-top: 12px;
-      padding-bottom: 12px;
-      font-size: 1rem;
+      &.header-cell {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        font-size: 1rem;
 
-      &:first-child {
-        padding-left: var(--container-h-padding);
-      }
+        &:first-child {
+          padding-left: var(--container-h-padding);
+        }
 
-      &:last-child {
-        padding-right: var(--container-h-padding);
+        &:last-child {
+          padding-right: var(--container-h-padding);
+        }
       }
     }
   }
@@ -135,6 +137,7 @@ button.header-button {
   cursor: pointer;
   width: min-content;
   font-weight: 500;
+  text-transform: uppercase;
 
   &:hover {
     text-decoration: underline;
