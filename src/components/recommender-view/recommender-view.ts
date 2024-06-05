@@ -3,7 +3,7 @@ import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { getPaperCitations } from '../../api/semantic-scholar';
 import { setsAreEqual } from '@xiaohk/utils';
-
+import { config } from '../../config/config';
 import {
   Step,
   SemanticAuthorDetail,
@@ -12,7 +12,14 @@ import {
   SemanticCitationAuthor
 } from '../../types/common-types';
 
+import '../slider/slider';
 import componentCSS from './recommender-view.css?inline';
+
+const MAX_RECOMMENDER_NUM = 100;
+const SLIDER_STYLE = {
+  foregroundColor: config.colors['blue-700'],
+  backgroundColor: config.colors['blue-100']
+};
 
 interface Recommender {
   authorID: string;
@@ -133,7 +140,7 @@ export class RecRecRecommenderView extends LitElement {
     // Get the top authors
     const recommenders: Recommender[] = [];
 
-    for (const [author, _] of citationCounts.slice(0, 100)) {
+    for (const [author, _] of citationCounts.slice(0, MAX_RECOMMENDER_NUM)) {
       const recommender: Recommender = {
         authorID: author,
         name: this.authorIDMap.get(author)!
@@ -157,14 +164,42 @@ export class RecRecRecommenderView extends LitElement {
   //==========================================================================||
   render() {
     // Compile the recommenders
-    let recommenderView = html``;
+    let recommenderCards = html``;
 
     for (const recommender of this.recommenders) {
-      recommenderView = html`${recommenderView}
+      recommenderCards = html`${recommenderCards}
         <div class="recommender-card">${recommender.name}</div> `;
     }
 
-    return html` <div class="recommender-view">${recommenderView}</div> `;
+    return html`
+      <div class="recommender-view">
+        <div class="control-bar">
+          <div class="control-block title-block">
+            <span class="title">${this.recommenders.length} Recommenders</span>
+          </div>
+
+          <div class="control-block slider-block">
+            <div class="citation-slider-label">Citation count > ${12}</div>
+            <nightjar-slider
+              min="0"
+              max="100"
+              .styleConfig=${SLIDER_STYLE}
+            ></nightjar-slider>
+          </div>
+
+          <div class="control-block slider-block">
+            <div class="citation-slider-label">Cite my works > ${12}</div>
+            <nightjar-slider
+              min="0"
+              max="100"
+              .styleConfig=${SLIDER_STYLE}
+            ></nightjar-slider>
+          </div>
+        </div>
+
+        <div class="recommender-content">${recommenderCards}</div>
+      </div>
+    `;
   }
 
   static styles = [
