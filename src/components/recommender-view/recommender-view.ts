@@ -12,13 +12,18 @@ import {
   SemanticCitationAuthor
 } from '../../types/common-types';
 
+import '@shoelace-style/shoelace/dist/components/select/select';
+import '@shoelace-style/shoelace/dist/components/option/option';
 import '../slider/slider';
+
+import '@shoelace-style/shoelace/dist/themes/light.css';
 import componentCSS from './recommender-view.css?inline';
 
 const MAX_RECOMMENDER_NUM = 100;
 const SLIDER_STYLE = {
   foregroundColor: config.colors['blue-700'],
-  backgroundColor: config.colors['blue-100']
+  backgroundColor: config.colors['blue-100'],
+  alignInner: false
 };
 
 interface Recommender {
@@ -154,6 +159,15 @@ export class RecRecRecommenderView extends LitElement {
   //==========================================================================||
   //                              Event Handlers                              ||
   //==========================================================================||
+  citationSliderChanged(e: CustomEvent<number>) {
+    const count = Math.round(e.detail);
+    console.log(count);
+  }
+
+  citeMeSliderChanged(e: CustomEvent<number>) {
+    const count = Math.round(e.detail);
+    console.log(count);
+  }
 
   //==========================================================================||
   //                             Private Helpers                              ||
@@ -178,9 +192,24 @@ export class RecRecRecommenderView extends LitElement {
             <span class="title">${this.recommenders.length} Recommenders</span>
           </div>
 
+          <div class="control-block select-block">
+            <span>Sorted by</span>
+
+            <div class="select-wrapper">
+              <select class="select-sort">
+                <option>Citing my works</option>
+                <option>Citation count</option>
+              </select>
+            </div>
+          </div>
+
           <div class="control-block slider-block">
-            <div class="citation-slider-label">Citation count > ${12}</div>
+            <div class="citation-slider-label">
+              Cited my works ≥ ${12} times
+            </div>
             <nightjar-slider
+              @valueChanged=${(e: CustomEvent<number>) =>
+                this.citeMeSliderChanged(e)}
               min="0"
               max="100"
               .styleConfig=${SLIDER_STYLE}
@@ -188,12 +217,35 @@ export class RecRecRecommenderView extends LitElement {
           </div>
 
           <div class="control-block slider-block">
-            <div class="citation-slider-label">Cite my works > ${12}</div>
+            <div class="citation-slider-label">Citation count ≥ ${12}</div>
             <nightjar-slider
+              @valueChanged=${(e: CustomEvent<number>) =>
+                this.citationSliderChanged(e)}
               min="0"
               max="100"
               .styleConfig=${SLIDER_STYLE}
             ></nightjar-slider>
+          </div>
+
+          <div class="control-block checkbox-block">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="checkbox-collaboration" />
+              <label for="checkbox-collaboration">Exclude collaborators</label>
+            </div>
+          </div>
+
+          <div class="control-block checkbox-block">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="checkbox-affiliation" />
+              <label for="checkbox-affiliation">Show affiliation</label>
+            </div>
+          </div>
+
+          <div class="control-block checkbox-block">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="checkbox-award" />
+              <label for="checkbox-award">Show awards</label>
+            </div>
           </div>
         </div>
 

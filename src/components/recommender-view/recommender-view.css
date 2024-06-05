@@ -11,12 +11,16 @@
 }
 
 .control-bar {
-  flex: 0 1 200px;
+  flex: 0 1 auto;
+
   display: flex;
   flex-flow: column;
   border-right: 1px solid var(--gray-300);
   height: 100%;
   gap: 10px;
+
+  --sl-color-primary-600: var(--blue-700);
+  --sl-font-size-medium: 1rem;
 }
 
 .control-block {
@@ -29,13 +33,14 @@
   box-sizing: border-box;
 
   .title {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--font-u1);
+    max-width: 240px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    display: inline-block;
+    font-size: var(--font-u2);
     font-weight: 600;
-    padding-top: 10px;
+    padding-top: 20px;
     line-height: 1;
   }
 
@@ -47,6 +52,52 @@
     gap: 5px;
     padding-top: 5px;
     padding-bottom: 5px;
+  }
+
+  .checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  &.select-block {
+    flex-flow: row;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .select-wrapper {
+    position: relative;
+    &::after {
+      right: 8px;
+      border-right: 2px solid hsl(0, 0%, 60%);
+      border-top: 2px solid hsl(0, 0%, 60%);
+      content: '';
+      display: block;
+      height: 5px;
+      width: 5px;
+      pointer-events: none;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%) rotate(135deg);
+      transform-origin: center;
+    }
+  }
+
+  & select.select-sort {
+    padding: 3px 22px 3px 5px;
+    margin: 0px;
+    position: relative;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+
+    border-radius: 4px;
+    border: 1px solid var(--gray-300);
+    background: white;
+
+    font-family: inherit;
+    font-size: var(--font-d2);
+    color: inherit;
   }
 }
 

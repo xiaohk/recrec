@@ -5,10 +5,6 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import componentCSS from './slider.css?inline';
 
-export interface ValueChangedMessage {
-  value: number;
-}
-
 export interface SliderStyleConfig {
   foregroundColor: string;
   backgroundColor: string;
@@ -136,10 +132,8 @@ export class NightjarSlider extends LitElement {
 
       // Notify the parent about the change
       const curValue = this.min + (this.max - this.min) * progress;
-      const event = new CustomEvent<ValueChangedMessage>('valueChanged', {
-        detail: {
-          value: curValue
-        }
+      const event = new CustomEvent<number>('valueChanged', {
+        detail: curValue
       });
       this.dispatchEvent(event);
 
