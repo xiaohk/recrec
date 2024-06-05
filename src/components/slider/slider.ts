@@ -12,6 +12,7 @@ export interface ValueChangedMessage {
 export interface SliderStyleConfig {
   foregroundColor: string;
   backgroundColor: string;
+  alignInner: boolean;
 }
 
 /**
@@ -169,7 +170,11 @@ export class NightjarSlider extends LitElement {
     };
 
     return html`
-      <div class="slider" style=${styleMap(cssVariables)}>
+      <div
+        class="slider"
+        ?align-inner=${this.styleConfig?.alignInner || false}
+        style=${styleMap(cssVariables)}
+      >
         <div class="slider-track background-track"></div>
         <div class="slider-track range-track"></div>
         <div
