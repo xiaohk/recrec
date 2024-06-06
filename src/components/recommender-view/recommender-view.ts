@@ -188,63 +188,77 @@ export class RecRecRecommenderView extends LitElement {
     return html`
       <div class="recommender-view">
         <div class="control-bar">
-          <div class="control-block title-block">
-            <span class="title">${this.recommenders.length} Recommenders</span>
-          </div>
+          <div class="control-section">
+            <div class="control-block title-block">
+              <span class="title"
+                >${this.recommenders.length} Recommenders</span
+              >
+            </div>
 
-          <div class="control-block select-block">
-            <span>Sorted by</span>
+            <div class="control-block select-block">
+              <span>Sorted by</span>
 
-            <div class="select-wrapper">
-              <select class="select-sort">
-                <option>Citing my works</option>
-                <option>Citation count</option>
-              </select>
+              <div class="select-wrapper">
+                <select class="select-sort">
+                  <option>Citing my works</option>
+                  <option>Citation count</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <div class="control-block slider-block">
-            <div class="citation-slider-label">
-              Cited my works ≥ ${12} times
+          <div class="separator"></div>
+
+          <div class="control-section control-section-slider">
+            <div class="control-block slider-block">
+              <div class="citation-slider-label">
+                Cited my works ≥ ${12} times
+              </div>
+              <nightjar-slider
+                @valueChanged=${(e: CustomEvent<number>) =>
+                  this.citeMeSliderChanged(e)}
+                min="0"
+                max="100"
+                .styleConfig=${SLIDER_STYLE}
+              ></nightjar-slider>
             </div>
-            <nightjar-slider
-              @valueChanged=${(e: CustomEvent<number>) =>
-                this.citeMeSliderChanged(e)}
-              min="0"
-              max="100"
-              .styleConfig=${SLIDER_STYLE}
-            ></nightjar-slider>
-          </div>
 
-          <div class="control-block slider-block">
-            <div class="citation-slider-label">Citation count ≥ ${12}</div>
-            <nightjar-slider
-              @valueChanged=${(e: CustomEvent<number>) =>
-                this.citationSliderChanged(e)}
-              min="0"
-              max="100"
-              .styleConfig=${SLIDER_STYLE}
-            ></nightjar-slider>
-          </div>
-
-          <div class="control-block checkbox-block">
-            <div class="checkbox-wrapper">
-              <input type="checkbox" id="checkbox-collaboration" />
-              <label for="checkbox-collaboration">Exclude collaborators</label>
+            <div class="control-block slider-block">
+              <div class="citation-slider-label">Citation count ≥ ${12}</div>
+              <nightjar-slider
+                @valueChanged=${(e: CustomEvent<number>) =>
+                  this.citationSliderChanged(e)}
+                min="0"
+                max="100"
+                .styleConfig=${SLIDER_STYLE}
+              ></nightjar-slider>
             </div>
           </div>
 
-          <div class="control-block checkbox-block">
-            <div class="checkbox-wrapper">
-              <input type="checkbox" id="checkbox-affiliation" />
-              <label for="checkbox-affiliation">Show affiliation</label>
-            </div>
-          </div>
+          <div class="separator"></div>
 
-          <div class="control-block checkbox-block">
-            <div class="checkbox-wrapper">
-              <input type="checkbox" id="checkbox-award" />
-              <label for="checkbox-award">Show awards</label>
+          <div class="control-section ">
+            <div class="control-block checkbox-block">
+              <div class="checkbox-wrapper">
+                <input type="checkbox" id="checkbox-collaboration" />
+                <label for="checkbox-collaboration"
+                  >Exclude collaborators</label
+                >
+              </div>
+            </div>
+
+            <div class="control-block checkbox-block">
+              <div class="checkbox-wrapper">
+                <input type="checkbox" id="checkbox-affiliation" />
+                <label for="checkbox-affiliation">Show affiliation</label>
+              </div>
+            </div>
+
+            <div class="control-block checkbox-block">
+              <div class="checkbox-wrapper">
+                <input type="checkbox" id="checkbox-award" />
+                <label for="checkbox-award">Show awards</label>
+              </div>
             </div>
           </div>
         </div>
