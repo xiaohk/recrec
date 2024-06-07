@@ -69,7 +69,9 @@ export interface SemanticAuthorSearchResponse {
   data: SemanticAuthorSearch[];
 }
 
-export interface SemanticAuthorDetail {
+export type SemanticAuthorDetail = SemanticAuthorDetailContent | null;
+
+export interface SemanticAuthorDetailContent {
   authorId: string;
   affiliations: string[];
   citationCount: number;

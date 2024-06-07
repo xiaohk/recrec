@@ -1,8 +1,11 @@
 import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { getPaperCitations } from '../../api/semantic-scholar';
-import { setsAreEqual } from '@xiaohk/utils';
+import {
+  getPaperCitations,
+  searchAuthorDetails
+} from '../../api/semantic-scholar';
+import { setsAreEqual, chunk } from '@xiaohk/utils';
 import { config } from '../../config/config';
 import {
   Step,
@@ -29,7 +32,10 @@ const SLIDER_STYLE = {
 interface Recommender {
   authorID: string;
   name: string;
+  isCollaborator?: boolean;
   affiliation?: string;
+  paperCount?: number;
+  citationCount?: number;
 }
 
 /**
@@ -55,7 +61,7 @@ export class RecRecRecommenderView extends LitElement {
   lastSelectedPaperIDs = new Set<string>();
 
   citationAuthorCount = new Map<string, number>();
-  authorIDMap = new Map<string, string>();
+  allAuthors = new Map<string, Recommender>();
 
   @state()
   recommenders: Recommender[] = [];
@@ -123,14 +129,55 @@ export class RecRecRecommenderView extends LitElement {
           }
 
           // Update ID map
-          if (!this.authorIDMap.has(author.authorId)) {
-            this.authorIDMap.set(author.authorId, author.name);
+          if (!this.allAuthors.has(author.authorId)) {
+            this.allAuthors.set(author.authorId, {
+              authorID: author.authorId,
+              name: author.name
+            });
           }
         }
       }
     }
 
     this.citationAuthorCount = citationAuthorCount;
+
+    // Determine the min and max of citations for the sliders
+    const allAuthorIDs = [...this.allAuthors.keys()];
+    const authorIDChunks = chunk(allAuthorIDs, 1000);
+
+    // Semantic scholar only supports up to 1000 authors in one batch, we use
+    // chunks to query information of all authors
+    const field = 'paperCount,citationCount';
+    console.time('Fetching authors');
+
+    for (const [i, chunk] of authorIDChunks.entries()) {
+      console.log(`Chunk: ${i}`);
+
+      const curResult = await searchAuthorDetails(chunk, field);
+
+      // Update the paper count and citation count for the authors in this batch
+      for (const author of curResult) {
+        if (author === null) {
+          continue;
+        }
+
+        if (!this.allAuthors.has(author.authorId)) {
+          throw Error(`Can't find author ${author.authorId}, ${author.name}`);
+        }
+
+        const curAuthor = this.allAuthors.get(author.authorId)!;
+        curAuthor.paperCount = author.paperCount;
+        curAuthor.citationCount = author.citationCount;
+        this.allAuthors.set(curAuthor.authorID, curAuthor);
+      }
+
+      // Short delay between consecutive API calls
+      await new Promise<void>(resolve => {
+        setTimeout(resolve, 1000);
+      });
+    }
+
+    console.timeEnd('Fetching authors');
 
     // Update the view
     this.updateCitationView();
@@ -148,7 +195,7 @@ export class RecRecRecommenderView extends LitElement {
     for (const [author, _] of citationCounts.slice(0, MAX_RECOMMENDER_NUM)) {
       const recommender: Recommender = {
         authorID: author,
-        name: this.authorIDMap.get(author)!
+        name: this.allAuthors.get(author)!.name
       };
       recommenders.push(recommender);
     }
@@ -201,7 +248,7 @@ export class RecRecRecommenderView extends LitElement {
               <div class="select-wrapper">
                 <select class="select-sort">
                   <option>Citing my works</option>
-                  <option>Citation count</option>
+                  <option>Total citation</option>
                 </select>
               </div>
             </div>

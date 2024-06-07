@@ -86,7 +86,7 @@ export class RecRecAuthorList extends LitElement {
       return;
     }
 
-    const data = await searchAuthorDetails(this.authors);
+    const data = await searchAuthorDetails(this.authors.map(d => d.authorId));
 
     this.authorDetails = data;
   }

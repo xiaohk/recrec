@@ -9,11 +9,34 @@ import type {
 
 import paperSearchMockJSON from '../../test/api-responses/paper-search.json';
 import citationSearchMockJSON from '../../test/api-responses/citation-search.json';
+import authorCitationSearchMockJSON0 from '../../test/api-responses/author-citation-search-8-0.json';
+import authorCitationSearchMockJSON1 from '../../test/api-responses/author-citation-search-8-1.json';
+import authorCitationSearchMockJSON2 from '../../test/api-responses/author-citation-search-8-2.json';
+import authorCitationSearchMockJSON3 from '../../test/api-responses/author-citation-search-8-3.json';
+import authorCitationSearchMockJSON4 from '../../test/api-responses/author-citation-search-8-4.json';
+import authorCitationSearchMockJSON5 from '../../test/api-responses/author-citation-search-8-5.json';
+import authorCitationSearchMockJSON6 from '../../test/api-responses/author-citation-search-8-6.json';
+import authorCitationSearchMockJSON7 from '../../test/api-responses/author-citation-search-8-7.json';
+import authorCitationSearchMockJSON8 from '../../test/api-responses/author-citation-search-8-8.json';
 
 const MOCK_HTTP_CALL = true;
+
 const paperSearchMock = paperSearchMockJSON as SemanticPaperSearchResponse;
 const citationSearchMock =
   citationSearchMockJSON as SemanticPaperCitationDetail[];
+
+let authorCitationMockCounter = 0;
+const authorCitationSearchMocks = [
+  authorCitationSearchMockJSON0 as SemanticAuthorDetail[],
+  authorCitationSearchMockJSON1 as SemanticAuthorDetail[],
+  authorCitationSearchMockJSON2 as SemanticAuthorDetail[],
+  authorCitationSearchMockJSON3 as SemanticAuthorDetail[],
+  authorCitationSearchMockJSON4 as SemanticAuthorDetail[],
+  authorCitationSearchMockJSON5 as SemanticAuthorDetail[],
+  authorCitationSearchMockJSON6 as SemanticAuthorDetail[],
+  authorCitationSearchMockJSON7 as SemanticAuthorDetail[],
+  authorCitationSearchMockJSON8 as SemanticAuthorDetail[]
+];
 
 /**
  * Searches for an author by name using the Semantic Scholar API.
@@ -37,22 +60,32 @@ export const searchAuthorByName = async (
 
 /**
  * Retrieves details for multiple authors using the Semantic Scholar API.
- * @param authors - An array of author search results.
+ * @param authors - An array of author IDs.
  * @returns A promise that resolves to an array of author details.
  * @throws Error if the fetch request fails.
  */
 export const searchAuthorDetails = async (
-  authors: SemanticAuthorSearch[]
+  authorIDs: string[],
+  fields?: string
 ): Promise<SemanticAuthorDetail[]> => {
+  if (fields !== undefined && MOCK_HTTP_CALL) {
+    const result = authorCitationSearchMocks[authorCitationMockCounter];
+    authorCitationMockCounter =
+      (authorCitationMockCounter + 1) % authorCitationSearchMocks.length;
+    return result;
+  }
+
   // Prepare for the fetch
-  const authorIDs = authors.map(d => d.authorId);
   const body = {
     ids: authorIDs
   };
 
   const baseURL = 'https://api.semanticscholar.org/graph/v1/author/batch';
+
+  const curFields =
+    fields || 'authorId,name,affiliations,homepage,paperCount,citationCount';
   const parameters: Record<string, string> = {
-    fields: 'authorId,name,affiliations,homepage,paperCount,citationCount'
+    fields: curFields
   };
   const encodedParameters = new URLSearchParams(parameters);
 
