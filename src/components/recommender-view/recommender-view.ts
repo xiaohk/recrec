@@ -15,6 +15,7 @@ import {
   SemanticCitationAuthor
 } from '../../types/common-types';
 
+import '@shoelace-style/shoelace/dist/components/progress-ring/progress-ring';
 import '@shoelace-style/shoelace/dist/components/select/select';
 import '@shoelace-style/shoelace/dist/components/option/option';
 import '../slider/slider';
@@ -65,6 +66,13 @@ export class RecRecRecommenderView extends LitElement {
 
   @state()
   recommenders: Recommender[] = [];
+
+  // Progress bar
+  @state()
+  totalStep = 1;
+
+  @state()
+  completedStep = 0;
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -145,6 +153,10 @@ export class RecRecRecommenderView extends LitElement {
     const allAuthorIDs = [...this.allAuthors.keys()];
     const authorIDChunks = chunk(allAuthorIDs, 1000);
 
+    // Update the progress ring info
+    this.totalStep = authorIDChunks.length + 1;
+    this.completedStep = 1;
+
     // Semantic scholar only supports up to 1000 authors in one batch, we use
     // chunks to query information of all authors
     const field = 'paperCount,citationCount';
@@ -175,6 +187,11 @@ export class RecRecRecommenderView extends LitElement {
       await new Promise<void>(resolve => {
         setTimeout(resolve, 1000);
       });
+
+      // Update progress ring
+      this.completedStep += 1;
+
+      // break;
     }
 
     console.timeEnd('Fetching authors');
@@ -232,8 +249,23 @@ export class RecRecRecommenderView extends LitElement {
         <div class="recommender-card">${recommender.name}</div> `;
     }
 
+    // Compile the progress overlay
+    const progressRing = html`
+      <div
+        class="progress-overlay"
+        ?is-completed=${this.completedStep === this.totalStep}
+      >
+        <sl-progress-ring
+          value=${(this.completedStep / this.totalStep) * 100}
+        ></sl-progress-ring>
+        <span class="progress-message">Fetching author details...</span>
+      </div>
+    `;
+
     return html`
       <div class="recommender-view">
+        ${progressRing}
+
         <div class="control-bar">
           <div class="control-section">
             <div class="control-block title-block">
