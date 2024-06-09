@@ -78,6 +78,7 @@ export interface SemanticAuthorDetailContent {
   homepage: string;
   name: string;
   paperCount: number;
+  hIndex: number;
 }
 
 export enum Step {

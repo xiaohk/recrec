@@ -6,6 +6,7 @@ import type {
   SemanticPaper,
   SemanticPaperCitationDetail
 } from '../types/common-types';
+import { downloadJSON } from '@xiaohk/utils';
 
 import paperSearchMockJSON from '../../test/api-responses/paper-search.json';
 import citationSearchMockJSON from '../../test/api-responses/citation-search.json';

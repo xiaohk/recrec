@@ -23,6 +23,7 @@ import '../slider/slider';
 import '@shoelace-style/shoelace/dist/themes/light.css';
 import componentCSS from './recommender-view.css?inline';
 
+const DEV_MODE = true;
 const MAX_RECOMMENDER_NUM = 100;
 const SLIDER_STYLE = {
   foregroundColor: config.colors['blue-700'],
@@ -35,8 +36,14 @@ interface Recommender {
   name: string;
   isCollaborator?: boolean;
   affiliation?: string;
-  paperCount?: number;
-  citationCount?: number;
+  hIndex?: number;
+}
+
+interface SliderRange {
+  min: number;
+  max: number;
+  curValue: number;
+  initialValue: number;
 }
 
 /**
@@ -73,6 +80,23 @@ export class RecRecRecommenderView extends LitElement {
 
   @state()
   completedStep = 0;
+
+  // Slider ranges
+  @state()
+  citationTimeRange: SliderRange = {
+    min: 1,
+    max: 2,
+    curValue: 1,
+    initialValue: 1
+  };
+
+  @state()
+  hIndexRange: SliderRange = {
+    min: 1,
+    max: 2,
+    curValue: 1,
+    initialValue: 1
+  };
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -149,6 +173,15 @@ export class RecRecRecommenderView extends LitElement {
 
     this.citationAuthorCount = citationAuthorCount;
 
+    // Find the min/max of the times an author cited my work
+    let minCitationTimes = Infinity;
+    let maxCitationTimes = -Infinity;
+
+    for (const citeTimes of citationAuthorCount.values()) {
+      minCitationTimes = Math.min(minCitationTimes, citeTimes);
+      maxCitationTimes = Math.max(maxCitationTimes, citeTimes);
+    }
+
     // Determine the min and max of citations for the sliders
     const allAuthorIDs = [...this.allAuthors.keys()];
     const authorIDChunks = chunk(allAuthorIDs, 1000);
@@ -159,8 +192,12 @@ export class RecRecRecommenderView extends LitElement {
 
     // Semantic scholar only supports up to 1000 authors in one batch, we use
     // chunks to query information of all authors
-    const field = 'paperCount,citationCount';
+    const field = 'hIndex';
     console.time('Fetching authors');
+
+    // Track the min/max of total citation count of authors and paper count
+    let minHIndex = Infinity;
+    let maxHIndex = -Infinity;
 
     for (const [i, chunk] of authorIDChunks.entries()) {
       console.log(`Chunk: ${i}`);
@@ -178,23 +215,35 @@ export class RecRecRecommenderView extends LitElement {
         }
 
         const curAuthor = this.allAuthors.get(author.authorId)!;
-        curAuthor.paperCount = author.paperCount;
-        curAuthor.citationCount = author.citationCount;
+        curAuthor.hIndex = author.hIndex;
         this.allAuthors.set(curAuthor.authorID, curAuthor);
+
+        // Update the min/max of total citation count of authors and paper count
+        minHIndex = Math.min(minHIndex, curAuthor.hIndex);
+        maxHIndex = Math.max(maxHIndex, curAuthor.hIndex);
       }
 
       // Short delay between consecutive API calls
       await new Promise<void>(resolve => {
-        setTimeout(resolve, 1000);
+        setTimeout(resolve, DEV_MODE ? 0 : 1000);
       });
 
       // Update progress ring
       this.completedStep += 1;
 
+      // this.completedStep = this.totalStep;
       // break;
     }
+    console.log(minHIndex, maxHIndex, minCitationTimes, maxCitationTimes);
 
     console.timeEnd('Fetching authors');
+
+    // Trigger a state update for the slider's ranges
+    this.hIndexRange.min = minHIndex;
+    this.hIndexRange.max = maxHIndex;
+
+    this.citationTimeRange.min = minCitationTimes;
+    this.citationTimeRange.max = maxCitationTimes;
 
     // Update the view
     this.updateCitationView();
@@ -209,7 +258,7 @@ export class RecRecRecommenderView extends LitElement {
     // Get the top authors
     const recommenders: Recommender[] = [];
 
-    for (const [author, _] of citationCounts.slice(0, MAX_RECOMMENDER_NUM)) {
+    for (const [author, _] of citationCounts) {
       const recommender: Recommender = {
         authorID: author,
         name: this.allAuthors.get(author)!.name
@@ -223,14 +272,18 @@ export class RecRecRecommenderView extends LitElement {
   //==========================================================================||
   //                              Event Handlers                              ||
   //==========================================================================||
-  citationSliderChanged(e: CustomEvent<number>) {
+  hIndexSliderChanged(e: CustomEvent<number>) {
     const count = Math.round(e.detail);
-    console.log(count);
+    const newHIndexRange = { ...this.hIndexRange };
+    newHIndexRange.curValue = count;
+    this.hIndexRange = newHIndexRange;
   }
 
   citeMeSliderChanged(e: CustomEvent<number>) {
     const count = Math.round(e.detail);
-    console.log(count);
+    const newCitationTimeRange = { ...this.citationTimeRange };
+    newCitationTimeRange.curValue = count;
+    this.citationTimeRange = newCitationTimeRange;
   }
 
   //==========================================================================||
@@ -291,24 +344,28 @@ export class RecRecRecommenderView extends LitElement {
           <div class="control-section control-section-slider">
             <div class="control-block slider-block">
               <div class="citation-slider-label">
-                Cited my works ≥ ${12} times
+                Cited my works ≥ ${this.citationTimeRange.curValue} times
               </div>
               <nightjar-slider
                 @valueChanged=${(e: CustomEvent<number>) =>
                   this.citeMeSliderChanged(e)}
-                min="0"
-                max="100"
+                min=${this.citationTimeRange.min}
+                max=${this.citationTimeRange.max}
+                curValue=${this.citationTimeRange.initialValue}
                 .styleConfig=${SLIDER_STYLE}
               ></nightjar-slider>
             </div>
 
             <div class="control-block slider-block">
-              <div class="citation-slider-label">Citation count ≥ ${12}</div>
+              <div class="citation-slider-label">
+                H-Index ≥ ${this.hIndexRange.curValue}
+              </div>
               <nightjar-slider
                 @valueChanged=${(e: CustomEvent<number>) =>
-                  this.citationSliderChanged(e)}
-                min="0"
-                max="100"
+                  this.hIndexSliderChanged(e)}
+                min=${this.hIndexRange.min}
+                max=${this.hIndexRange.max}
+                curValue=${this.hIndexRange.initialValue}
                 .styleConfig=${SLIDER_STYLE}
               ></nightjar-slider>
             </div>
