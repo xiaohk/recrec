@@ -58,6 +58,10 @@ export class NightjarSlider extends LitElement {
   willUpdate(changedProperties: PropertyValues<this>) {
     if (changedProperties.has('curValue') && this.curValue !== null) {
       this.syncThumb();
+    } else if (changedProperties.has('min')) {
+      this.syncThumb();
+    } else if (changedProperties.has('max')) {
+      this.syncThumb();
     }
   }
 
