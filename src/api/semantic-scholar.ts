@@ -109,6 +109,9 @@ export const searchAuthorDetails = async (
   }
 
   const data = (await response.json()) as SemanticAuthorDetail[];
+
+  // downloadJSON(data, null, 'author.json');
+
   return data;
 };
 

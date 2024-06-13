@@ -22,6 +22,8 @@ import '../slider/slider';
 
 import '@shoelace-style/shoelace/dist/themes/light.css';
 import componentCSS from './recommender-view.css?inline';
+import iconHIndex from '../../images/icon-hindex-c.svg?raw';
+import iconCiteTimes from '../../images/icon-cite-times-c.svg?raw';
 
 const DEV_MODE = true;
 const MAX_RECOMMENDER_NUM = 100;
@@ -37,6 +39,8 @@ interface Recommender {
   isCollaborator?: boolean;
   affiliation?: string;
   hIndex?: number;
+  citeTimes?: number;
+  url?: string;
 }
 
 interface SliderRange {
@@ -177,9 +181,18 @@ export class RecRecRecommenderView extends LitElement {
     let minCitationTimes = Infinity;
     let maxCitationTimes = -Infinity;
 
-    for (const citeTimes of citationAuthorCount.values()) {
+    for (const [authorID, citeTimes] of citationAuthorCount.entries()) {
       minCitationTimes = Math.min(minCitationTimes, citeTimes);
       maxCitationTimes = Math.max(maxCitationTimes, citeTimes);
+
+      // Copy the citation times info to `allAuthors`
+      const authorInfo = this.allAuthors.get(authorID);
+      if (authorInfo === undefined) {
+        throw Error(`Can't find author info for ${authorID}`);
+      }
+
+      authorInfo.citeTimes = citeTimes;
+      this.allAuthors.set(authorID, authorInfo);
     }
 
     // Determine the min and max of citations for the sliders
@@ -192,7 +205,7 @@ export class RecRecRecommenderView extends LitElement {
 
     // Semantic scholar only supports up to 1000 authors in one batch, we use
     // chunks to query information of all authors
-    const field = 'hIndex';
+    const field = 'hIndex,url';
     console.time('Fetching authors');
 
     // Track the min/max of total citation count of authors and paper count
@@ -211,16 +224,21 @@ export class RecRecRecommenderView extends LitElement {
         }
 
         if (!this.allAuthors.has(author.authorId)) {
-          throw Error(`Can't find author ${author.authorId}, ${author.name}`);
+          throw new Error(
+            `Can't find author ${author.authorId}, ${author.name}`
+          );
         }
 
         const curAuthor = this.allAuthors.get(author.authorId)!;
-        curAuthor.hIndex = author.hIndex;
+
+        curAuthor.hIndex = author.hIndex || 0;
+        curAuthor.url = `https://www.semanticscholar.org/author/${author.authorId}`;
+
         this.allAuthors.set(curAuthor.authorID, curAuthor);
 
         // Update the min/max of total citation count of authors and paper count
-        minHIndex = Math.min(minHIndex, curAuthor.hIndex);
-        maxHIndex = Math.max(maxHIndex, curAuthor.hIndex);
+        minHIndex = Math.min(minHIndex, curAuthor.hIndex!);
+        maxHIndex = Math.max(maxHIndex, curAuthor.hIndex!);
       }
 
       // Short delay between consecutive API calls
@@ -259,9 +277,17 @@ export class RecRecRecommenderView extends LitElement {
     const recommenders: Recommender[] = [];
 
     for (const [author, _] of citationCounts) {
+      const authorInfo = this.allAuthors.get(author);
+      if (authorInfo === undefined) {
+        throw Error(`Fail to get info for author: ${author}`);
+      }
+
       const recommender: Recommender = {
         authorID: author,
-        name: this.allAuthors.get(author)!.name
+        name: authorInfo.name,
+        hIndex: authorInfo.hIndex,
+        citeTimes: authorInfo.citeTimes,
+        url: authorInfo.url
       };
       recommenders.push(recommender);
     }
@@ -299,7 +325,19 @@ export class RecRecRecommenderView extends LitElement {
 
     for (const recommender of this.recommenders) {
       recommenderCards = html`${recommenderCards}
-        <div class="recommender-card">${recommender.name}</div> `;
+        <a class="recommender-card" href="${recommender.url!}" target="_blank">
+          <div class="header">${recommender.name}</div>
+          <div class="info-bar">
+            <div class="info-block cite-time">
+              <span class="svg-icon">${unsafeHTML(iconCiteTimes)}</span>
+              ${recommender.citeTimes}
+            </div>
+            <div class="info-block">
+              <span class="svg-icon">${unsafeHTML(iconHIndex)}</span>
+              ${recommender.hIndex}
+            </div>
+          </div>
+        </a> `;
     }
 
     // Compile the progress overlay

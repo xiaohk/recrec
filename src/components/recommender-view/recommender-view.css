@@ -11,6 +11,24 @@
   position: relative;
 }
 
+.svg-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 1em;
+  height: 1em;
+
+  color: currentColor;
+  transition: transform 80ms linear;
+  transform-origin: center;
+
+  & svg {
+    fill: currentColor;
+    width: 100%;
+    height: 100%;
+  }
+}
+
 .control-bar {
   flex: 0 1 auto;
 
@@ -152,13 +170,50 @@
   flex-flow: row wrap;
   justify-content: flex-start;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
 }
 
 .recommender-card {
-  padding: 2px 5px;
+  padding: 7px 10px;
   border-radius: 5px;
   border: 1px solid var(--gray-300);
+  line-height: 1;
+
+  display: flex;
+  flex-flow: column;
+  gap: 6px;
+
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    box-shadow:
+      0 0 1px hsla(0, 0%, 0%, 0.1),
+      0 0 10px hsla(0, 0%, 0%, 0.05);
+  }
+
+  .info-bar {
+    font-size: var(--font-d4);
+    display: flex;
+    gap: 10px;
+  }
+
+  .info-block {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    background-color: var(--gray-100);
+    padding: 2px 4px;
+    border-radius: 2px;
+
+    &.cite-time {
+      gap: 2px;
+    }
+  }
+
+  .svg-icon {
+    color: var(--gray-400);
+  }
 }
 
 .progress-overlay {

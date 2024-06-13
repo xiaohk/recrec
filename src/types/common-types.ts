@@ -73,12 +73,13 @@ export type SemanticAuthorDetail = SemanticAuthorDetailContent | null;
 
 export interface SemanticAuthorDetailContent {
   authorId: string;
-  affiliations: string[];
-  citationCount: number;
-  homepage: string;
-  name: string;
-  paperCount: number;
-  hIndex: number;
+  affiliations?: string[];
+  citationCount?: number;
+  homepage?: string;
+  name?: string;
+  paperCount?: number;
+  hIndex?: number;
+  url?: string;
 }
 
 export enum Step {
