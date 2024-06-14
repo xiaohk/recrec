@@ -181,10 +181,15 @@
 
   display: flex;
   flex-flow: column;
-  gap: 6px;
+  gap: 8px;
 
   color: inherit;
   text-decoration: none;
+
+  .header {
+    font-weight: 600;
+    font-size: var(--font-d1);
+  }
 
   &:hover {
     box-shadow:

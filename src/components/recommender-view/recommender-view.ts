@@ -26,7 +26,7 @@ import iconHIndex from '../../images/icon-hindex-c.svg?raw';
 import iconCiteTimes from '../../images/icon-cite-times-c.svg?raw';
 
 const DEV_MODE = true;
-const MAX_RECOMMENDER_NUM = 100;
+const MAX_RECOMMENDER_NUM = 500;
 const SLIDER_STYLE = {
   foregroundColor: config.colors['blue-700'],
   backgroundColor: config.colors['blue-100'],
@@ -75,8 +75,13 @@ export class RecRecRecommenderView extends LitElement {
   citationAuthorCount = new Map<string, number>();
   allAuthors = new Map<string, Recommender>();
 
+  allRecommenders: Recommender[] = [];
+
   @state()
-  recommenders: Recommender[] = [];
+  shownRecommenders: Recommender[] = [];
+
+  @state()
+  curRecommendersSize = 0;
 
   // Progress bar
   @state()
@@ -101,6 +106,10 @@ export class RecRecRecommenderView extends LitElement {
     curValue: 1,
     initialValue: 1
   };
+
+  // Sorting and filter
+  @state()
+  sortBy: 'citeTimes' | 'hIndex' = 'citeTimes';
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -141,6 +150,8 @@ export class RecRecRecommenderView extends LitElement {
   async initData() {}
 
   async updateCitations() {
+    console.log('called');
+
     // Skip updating if the selected papers have not changed
     if (setsAreEqual(this.selectedPaperIDs, this.lastSelectedPaperIDs)) {
       return;
@@ -264,35 +275,71 @@ export class RecRecRecommenderView extends LitElement {
     this.citationTimeRange.max = maxCitationTimes;
 
     // Update the view
+    this.initCitationView();
     this.updateCitationView();
   }
 
-  updateCitationView() {
-    // Filter authors citing at least 2 times and sort them based on count
-    const citationCounts = [...this.citationAuthorCount.entries()]
-      .filter(d => d[1] > 1 && d[0] != null)
-      .sort((a, b) => b[1] - a[1]);
+  initCitationView() {
+    // Initialize all recommenders
+    this.allRecommenders = [];
 
-    // Get the top authors
-    const recommenders: Recommender[] = [];
-
-    for (const [author, _] of citationCounts) {
+    for (const [author, _] of this.citationAuthorCount.entries()) {
       const authorInfo = this.allAuthors.get(author);
       if (authorInfo === undefined) {
-        throw Error(`Fail to get info for author: ${author}`);
+        console.error(`Fail to get info for author: ${author}`);
+        continue;
+      }
+
+      if (authorInfo.citeTimes === undefined) {
+        console.warn(
+          `Author ${authorInfo.name} ${authorInfo.authorID} is incomplete.`
+        );
+        continue;
       }
 
       const recommender: Recommender = {
         authorID: author,
         name: authorInfo.name,
-        hIndex: authorInfo.hIndex,
+        hIndex: authorInfo.hIndex || 0,
         citeTimes: authorInfo.citeTimes,
         url: authorInfo.url
       };
-      recommenders.push(recommender);
+      this.allRecommenders.push(recommender);
     }
-    this.recommenders = recommenders;
-    console.log(citationCounts);
+  }
+
+  /**
+   * Apply the latest filter and sorting to the recommenders
+   */
+  updateCitationView() {
+    const recommenders: Recommender[] = [];
+    console.log(this.allRecommenders);
+
+    // Apply filters
+    for (const recommender of this.allRecommenders) {
+      if (recommender.citeTimes === undefined) {
+        console.error(`Author ${recommender.authorID}'s info is incomplete.`);
+      }
+
+      if (
+        recommender.hIndex! >= this.hIndexRange.curValue &&
+        recommender.citeTimes! >= this.citationTimeRange.curValue
+      ) {
+        recommenders.push(recommender);
+      }
+    }
+
+    // Apply sorting
+    if (this.sortBy === 'citeTimes') {
+      recommenders.sort((a, b) => b.citeTimes! - a.citeTimes!);
+    } else if (this.sortBy === 'hIndex') {
+      recommenders.sort((a, b) => b.hIndex! - a.hIndex!);
+    }
+
+    this.curRecommendersSize = recommenders.length;
+    this.shownRecommenders = recommenders.slice(0, MAX_RECOMMENDER_NUM);
+
+    console.log('Currecommenders updated');
   }
 
   //==========================================================================||
@@ -312,6 +359,15 @@ export class RecRecRecommenderView extends LitElement {
     this.citationTimeRange = newCitationTimeRange;
   }
 
+  selectChanged(e: InputEvent) {
+    const curValue = (e.currentTarget as HTMLSelectElement).value;
+    if (curValue === 'hIndex') {
+      this.sortBy = curValue;
+    } else {
+      this.sortBy = 'citeTimes';
+    }
+  }
+
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
@@ -323,7 +379,7 @@ export class RecRecRecommenderView extends LitElement {
     // Compile the recommenders
     let recommenderCards = html``;
 
-    for (const recommender of this.recommenders) {
+    for (const recommender of this.shownRecommenders) {
       recommenderCards = html`${recommenderCards}
         <a class="recommender-card" href="${recommender.url!}" target="_blank">
           <div class="header">${recommender.name}</div>
@@ -361,7 +417,7 @@ export class RecRecRecommenderView extends LitElement {
           <div class="control-section">
             <div class="control-block title-block">
               <span class="title"
-                >${this.recommenders.length} Recommenders</span
+                >${this.curRecommendersSize} Recommenders</span
               >
             </div>
 
@@ -369,9 +425,14 @@ export class RecRecRecommenderView extends LitElement {
               <span>Sorted by</span>
 
               <div class="select-wrapper">
-                <select class="select-sort">
-                  <option>Citing my works</option>
-                  <option>Total citation</option>
+                <select
+                  class="select-sort"
+                  @change=${(e: InputEvent) => {
+                    this.selectChanged(e);
+                  }}
+                >
+                  <option value="citeTimes">Citing my works</option>
+                  <option value="hIndex">H-Index</option>
                 </select>
               </div>
             </div>
