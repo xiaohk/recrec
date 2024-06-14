@@ -179,11 +179,14 @@
   display: flex;
   flex-flow: row wrap;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 14px;
 }
 
 .recommender-card {
+  max-width: 200px;
+  box-sizing: border-box;
+
   padding: 7px 10px;
   border-radius: 5px;
   border: 1px solid var(--gray-300);
@@ -191,7 +194,7 @@
 
   display: flex;
   flex-flow: column;
-  gap: 8px;
+  gap: 4px;
 
   color: inherit;
   text-decoration: none;
@@ -203,7 +206,7 @@
 
   &:hover {
     box-shadow:
-      0 0 1px hsla(0, 0%, 0%, 0.1),
+      0 0 1px hsla(0, 0%, 0%, 0.2),
       0 0 10px hsla(0, 0%, 0%, 0.05);
   }
 
@@ -211,6 +214,23 @@
     font-size: var(--font-d4);
     display: flex;
     gap: 10px;
+
+    &.icons {
+      padding-top: 2px;
+    }
+
+    &[no-show] {
+      display: none;
+    }
+  }
+
+  .info-label {
+    display: inline;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-bottom: 2px;
   }
 
   .info-block {

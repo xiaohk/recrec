@@ -218,7 +218,7 @@ export class RecRecRecommenderView extends LitElement {
 
     // Semantic scholar only supports up to 1000 authors in one batch, we use
     // chunks to query information of all authors
-    const field = 'hIndex,url';
+    const field = 'hIndex,affiliations';
     console.time('Fetching authors');
 
     // Track the min/max of total citation count of authors and paper count
@@ -246,6 +246,7 @@ export class RecRecRecommenderView extends LitElement {
 
         curAuthor.hIndex = author.hIndex || 0;
         curAuthor.url = `https://www.semanticscholar.org/author/${author.authorId}`;
+        curAuthor.affiliation = author.affiliations?.join(', ');
 
         this.allAuthors.set(curAuthor.authorID, curAuthor);
 
@@ -305,7 +306,8 @@ export class RecRecRecommenderView extends LitElement {
         name: authorInfo.name,
         hIndex: authorInfo.hIndex || 0,
         citeTimes: authorInfo.citeTimes,
-        url: authorInfo.url
+        url: authorInfo.url,
+        affiliation: authorInfo.affiliation
       };
       this.allRecommenders.push(recommender);
     }
@@ -407,7 +409,17 @@ export class RecRecRecommenderView extends LitElement {
       recommenderCards = html`${recommenderCards}
         <a class="recommender-card" href="${recommender.url!}" target="_blank">
           <div class="header">${recommender.name}</div>
-          <div class="info-bar">
+
+          <div
+            class="info-bar info-label"
+            title=${recommender.affiliation || ''}
+            ?no-show=${recommender.affiliation === undefined ||
+            recommender.affiliation === ''}
+          >
+            ${recommender.affiliation}
+          </div>
+
+          <div class="info-bar icons">
             <div class="info-block cite-time">
               <span class="svg-icon">${unsafeHTML(iconCiteTimes)}</span>
               ${recommender.citeTimes}
