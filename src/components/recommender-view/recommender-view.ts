@@ -111,6 +111,8 @@ export class RecRecRecommenderView extends LitElement {
   @state()
   sortBy: 'citeTimes' | 'hIndex' = 'citeTimes';
 
+  curShownCardSizeMultiplier = 1;
+
   //==========================================================================||
   //                             Lifecycle Methods                            ||
   //==========================================================================||
@@ -282,6 +284,7 @@ export class RecRecRecommenderView extends LitElement {
   initCitationView() {
     // Initialize all recommenders
     this.allRecommenders = [];
+    this.curShownCardSizeMultiplier = 1;
 
     for (const [author, _] of this.citationAuthorCount.entries()) {
       const authorInfo = this.allAuthors.get(author);
@@ -313,7 +316,6 @@ export class RecRecRecommenderView extends LitElement {
    */
   updateCitationView() {
     const recommenders: Recommender[] = [];
-    console.log(this.allRecommenders);
 
     // Apply filters
     for (const recommender of this.allRecommenders) {
@@ -337,9 +339,12 @@ export class RecRecRecommenderView extends LitElement {
     }
 
     this.curRecommendersSize = recommenders.length;
-    this.shownRecommenders = recommenders.slice(0, MAX_RECOMMENDER_NUM);
+    this.shownRecommenders = recommenders.slice(
+      0,
+      MAX_RECOMMENDER_NUM * this.curShownCardSizeMultiplier
+    );
 
-    console.log('Currecommenders updated');
+    console.log('Cur-recommenders updated');
   }
 
   //==========================================================================||
@@ -366,6 +371,25 @@ export class RecRecRecommenderView extends LitElement {
     } else {
       this.sortBy = 'citeTimes';
     }
+  }
+
+  async showMoreButtonClicked() {
+    if (this.shadowRoot === null) {
+      throw Error('shadowRoot is null');
+    }
+
+    // Need to manually track the scroll position and set it after updating the list
+    const contentList = this.shadowRoot.querySelector(
+      '.right-content'
+    ) as HTMLElement;
+    const scrollTop = contentList.scrollTop;
+
+    // Update the list
+    this.curShownCardSizeMultiplier += 1;
+    this.updateCitationView();
+
+    await this.updateComplete;
+    contentList.scrollTop = scrollTop;
   }
 
   //==========================================================================||
@@ -485,20 +509,37 @@ export class RecRecRecommenderView extends LitElement {
             <div class="control-block checkbox-block">
               <div class="checkbox-wrapper">
                 <input type="checkbox" id="checkbox-affiliation" />
-                <label for="checkbox-affiliation">Show affiliation</label>
+                <label for="checkbox-affiliation">Have affiliation</label>
               </div>
             </div>
 
             <div class="control-block checkbox-block">
               <div class="checkbox-wrapper">
                 <input type="checkbox" id="checkbox-award" />
-                <label for="checkbox-award">Show awards</label>
+                <label for="checkbox-award">Have awards</label>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="recommender-content">${recommenderCards}</div>
+        <div class="right-content">
+          <div class="recommender-content">${recommenderCards}</div>
+
+          <div class="footer">
+            <button
+              ?no-show=${this.curRecommendersSize <=
+              this.shownRecommenders.length}
+              @click=${() => {
+                this.showMoreButtonClicked().then(
+                  () => {},
+                  () => {}
+                );
+              }}
+            >
+              Show More
+            </button>
+          </div>
+        </div>
       </div>
     `;
   }
