@@ -407,8 +407,10 @@ export class RecRecRecommenderView extends LitElement {
 
     for (const recommender of this.shownRecommenders) {
       recommenderCards = html`${recommenderCards}
-        <a class="recommender-card" href="${recommender.url!}" target="_blank">
-          <div class="header">${recommender.name}</div>
+        <div class="recommender-card">
+          <a class="header" href="${recommender.url!}" target="_blank"
+            >${recommender.name}</a
+          >
 
           <div
             class="info-bar info-label"
@@ -420,16 +422,21 @@ export class RecRecRecommenderView extends LitElement {
           </div>
 
           <div class="info-bar icons">
-            <div class="info-block cite-time">
+            <div class="info-block cite-time info-icon">
               <span class="svg-icon">${unsafeHTML(iconCiteTimes)}</span>
               ${recommender.citeTimes}
             </div>
-            <div class="info-block">
+
+            <a
+              class="info-block info-icon"
+              href="${recommender.url!}"
+              target="_blank"
+            >
               <span class="svg-icon">${unsafeHTML(iconHIndex)}</span>
               ${recommender.hIndex}
-            </div>
+            </a>
           </div>
-        </a> `;
+        </div> `;
     }
 
     // Compile the progress overlay

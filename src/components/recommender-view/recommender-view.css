@@ -191,23 +191,22 @@
   border-radius: 5px;
   border: 1px solid var(--gray-300);
   line-height: 1;
+  cursor: default;
 
   display: flex;
   flex-flow: column;
-  gap: 4px;
-
-  color: inherit;
-  text-decoration: none;
+  gap: 5px;
 
   .header {
     font-weight: 600;
     font-size: var(--font-d1);
-  }
 
-  &:hover {
-    box-shadow:
-      0 0 1px hsla(0, 0%, 0%, 0.2),
-      0 0 10px hsla(0, 0%, 0%, 0.05);
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--blue-800);
+    }
   }
 
   .info-bar {
@@ -216,7 +215,8 @@
     gap: 10px;
 
     &.icons {
-      padding-top: 2px;
+      padding-top: 0px;
+      margin-top: auto;
     }
 
     &[no-show] {
@@ -238,16 +238,24 @@
     align-items: center;
     gap: 1px;
     background-color: var(--gray-100);
-    padding: 2px 4px;
+    padding: 3px 4px;
     border-radius: 2px;
+
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
 
     &.cite-time {
       gap: 2px;
     }
+
+    &:hover {
+      background-color: var(--gray-200);
+    }
   }
 
   .svg-icon {
-    color: var(--gray-400);
+    color: var(--gray-500);
   }
 }
 
