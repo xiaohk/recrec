@@ -6,6 +6,7 @@ import {
   searchAuthorDetails
 } from '../../api/semantic-scholar';
 import { setsAreEqual, chunk } from '@xiaohk/utils';
+import { computePosition, offset, flip, shift, arrow } from '@floating-ui/dom';
 import { config } from '../../config/config';
 import {
   Step,
@@ -74,6 +75,7 @@ export class RecRecRecommenderView extends LitElement {
 
   citationAuthorCount = new Map<string, number>();
   allAuthors = new Map<string, Recommender>();
+  paperCitingAuthorCountMap = new Map<string, Map<string, number>>();
 
   allRecommenders: Recommender[] = [];
 
@@ -112,6 +114,16 @@ export class RecRecRecommenderView extends LitElement {
   sortBy: 'citeTimes' | 'hIndex' = 'citeTimes';
 
   curShownCardSizeMultiplier = 1;
+
+  // Floating UIs
+  @query('#popper-tooltip')
+  popperTooltip: HTMLElement | undefined;
+
+  @query('#paper-overlay')
+  paperOverlayElement: HTMLElement | undefined;
+
+  @state()
+  overlayPaperCounts: [string, number][] = [];
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -166,9 +178,25 @@ export class RecRecRecommenderView extends LitElement {
     // Count the authors in the citations
     const citationAuthorCount = new Map<string, number>();
 
+    // Map paper id => Map <citing author, cite count to that paper>
+    const paperCitationAuthorMap = new Map<string, Map<string, number>>();
+
     for (const paper of paperCitations) {
+      const curCitingAuthorCiteTimes = new Map<string, number>();
+
       for (const citation of paper.citations) {
         for (const author of citation.authors) {
+          if (author.authorId === null) {
+            continue;
+          }
+
+          if (curCitingAuthorCiteTimes.has(author.authorId)) {
+            const oldTimes = curCitingAuthorCiteTimes.get(author.authorId)!;
+            curCitingAuthorCiteTimes.set(author.authorId, oldTimes + 1);
+          } else {
+            curCitingAuthorCiteTimes.set(author.authorId, 1);
+          }
+
           // Update count
           if (citationAuthorCount.has(author.authorId)) {
             const oldCount = citationAuthorCount.get(author.authorId)!;
@@ -186,8 +214,11 @@ export class RecRecRecommenderView extends LitElement {
           }
         }
       }
+
+      paperCitationAuthorMap.set(paper.paperId, curCitingAuthorCiteTimes);
     }
 
+    this.paperCitingAuthorCountMap = paperCitationAuthorMap;
     this.citationAuthorCount = citationAuthorCount;
 
     // Find the min/max of the times an author cited my work
@@ -394,9 +425,49 @@ export class RecRecRecommenderView extends LitElement {
     contentList.scrollTop = scrollTop;
   }
 
+  async citeTimeButtonClicked(e: MouseEvent, recommender: Recommender) {
+    if (!this.paperOverlayElement) {
+      console.error('paperOverlayElement are not initialized yet.');
+      return;
+    }
+
+    const anchor = e.currentTarget as HTMLElement;
+
+    // Compute the number of times that this author has cite each paper
+    this.overlayPaperCounts = this.getPaperCiteCounts(recommender.authorID);
+    await this.updateComplete;
+
+    updatePopperOverlay(this.paperOverlayElement, anchor, 'left', true, 10);
+    this.paperOverlayElement.classList.remove('hidden');
+  }
+
+  citeTimeBlurred() {
+    if (!this.paperOverlayElement) {
+      console.error('paperOverlayElement are not initialized yet.');
+      return;
+    }
+
+    this.paperOverlayElement.classList.add('hidden');
+  }
+
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
+  getPaperCiteCounts(authorID: string) {
+    const paperCounts: [string, number][] = [];
+
+    for (const paper of this.papers) {
+      const countMap = this.paperCitingAuthorCountMap.get(paper.paperId)!;
+      if (countMap.has(authorID)) {
+        paperCounts.push([paper.title, countMap.get(authorID)!]);
+      }
+    }
+
+    // Sort the papers by the cite times
+    paperCounts.sort((a, b) => b[1] - a[1]);
+
+    return paperCounts;
+  }
 
   //==========================================================================||
   //                           Templates and Styles                           ||
@@ -422,7 +493,13 @@ export class RecRecRecommenderView extends LitElement {
           </div>
 
           <div class="info-bar icons">
-            <div class="info-block cite-time info-icon">
+            <div
+              class="info-block cite-time info-icon"
+              tabindex="0"
+              @click=${(e: MouseEvent) =>
+                this.citeTimeButtonClicked(e, recommender)}
+              @blur=${() => this.citeTimeBlurred()}
+            >
               <span class="svg-icon">${unsafeHTML(iconCiteTimes)}</span>
               ${recommender.citeTimes}
             </div>
@@ -451,6 +528,16 @@ export class RecRecRecommenderView extends LitElement {
         <span class="progress-message">Fetching author details...</span>
       </div>
     `;
+
+    // Compile the paper overlay
+    let paperOverlayContent = html``;
+    for (const [paper, count] of this.overlayPaperCounts) {
+      paperOverlayContent = html`${paperOverlayContent}
+        <tr>
+          <td class="td-paper">${paper}</td>
+          <td class="td-count">${count}x</td>
+        </tr> `;
+    }
 
     return html`
       <div class="recommender-view">
@@ -559,6 +646,20 @@ export class RecRecRecommenderView extends LitElement {
             </button>
           </div>
         </div>
+
+        <div id="popper-tooltip" class="popper-tooltip hidden" role="tooltip">
+          <span class="popper-content"></span>
+          <div class="popper-arrow"></div>
+        </div>
+
+        <div id="paper-overlay" class="popper-tooltip hidden" role="tooltip">
+          <table class="popper-content">
+            <tbody>
+              ${paperOverlayContent}
+            </tbody>
+          </table>
+          <div class="popper-arrow"></div>
+        </div>
       </div>
     `;
   }
@@ -575,3 +676,61 @@ declare global {
     'recrec-recommender-view': RecRecRecommenderView;
   }
 }
+
+/**
+ * Update the popper tooltip for the highlighted prompt point
+ * @param tooltip Tooltip element
+ * @param anchor Anchor point for the tooltip
+ * @param point The prompt point
+ */
+export const updatePopperOverlay = (
+  tooltip: HTMLElement,
+  anchor: HTMLElement,
+  placement: 'bottom' | 'left' | 'top' | 'right',
+  withArrow: boolean,
+  offsetAmount = 8
+) => {
+  const arrowElement = tooltip.querySelector('.popper-arrow')! as HTMLElement;
+
+  if (withArrow) {
+    arrowElement.classList.remove('hidden');
+    computePosition(anchor, tooltip, {
+      placement: placement,
+      middleware: [
+        offset(offsetAmount),
+        flip(),
+        shift(),
+        arrow({ element: arrowElement })
+      ]
+    })
+      .then(({ x, y, placement, middlewareData }) => {
+        tooltip.style.left = `${x}px`;
+        tooltip.style.top = `${y}px`;
+
+        const { x: arrowX, y: arrowY } = middlewareData.arrow!;
+        let staticSide: 'bottom' | 'left' | 'top' | 'right' = 'bottom';
+        if (placement.includes('top')) staticSide = 'bottom';
+        if (placement.includes('right')) staticSide = 'left';
+        if (placement.includes('bottom')) staticSide = 'top';
+        if (placement.includes('left')) staticSide = 'right';
+
+        arrowElement.style.left = arrowX ? `${arrowX}px` : '';
+        arrowElement.style.top = arrowY ? `${arrowY}px` : '';
+        arrowElement.style.right = '';
+        arrowElement.style.bottom = '';
+        arrowElement.style[staticSide] = '-4px';
+      })
+      .catch(() => {});
+  } else {
+    arrowElement.classList.add('hidden');
+    computePosition(anchor, tooltip, {
+      placement: placement,
+      middleware: [offset(6), flip(), shift()]
+    })
+      .then(({ x, y }) => {
+        tooltip.style.left = `${x}px`;
+        tooltip.style.top = `${y}px`;
+      })
+      .catch(() => {});
+  }
+};
