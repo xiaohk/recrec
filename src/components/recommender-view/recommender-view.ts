@@ -6,8 +6,18 @@ import {
   searchAuthorDetails
 } from '../../api/semantic-scholar';
 import { setsAreEqual, chunk } from '@xiaohk/utils';
-import { computePosition, offset, flip, shift, arrow } from '@floating-ui/dom';
+import {
+  computePosition,
+  autoUpdate,
+  offset,
+  flip,
+  shift,
+  arrow,
+  hide
+} from '@floating-ui/dom';
+import { format } from 'd3-format';
 import { config } from '../../config/config';
+
 import {
   Step,
   SemanticAuthorDetail,
@@ -124,6 +134,11 @@ export class RecRecRecommenderView extends LitElement {
 
   @state()
   overlayPaperCounts: [string, number][] = [];
+
+  curClickedCiteTimeAuthorID: string | null = null;
+  overlayCleanup = () => {};
+
+  numberFormatter = format(',');
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -431,13 +446,32 @@ export class RecRecRecommenderView extends LitElement {
       return;
     }
 
+    if (this.curClickedCiteTimeAuthorID === recommender.authorID) {
+      // This overlay is already shown. We hide it if the user clicks the button (again)
+      this.paperOverlayElement.classList.add('hidden');
+      this.curClickedCiteTimeAuthorID = null;
+      this.overlayCleanup();
+      this.overlayCleanup = () => {};
+      return;
+    }
+
     const anchor = e.currentTarget as HTMLElement;
 
     // Compute the number of times that this author has cite each paper
     this.overlayPaperCounts = this.getPaperCiteCounts(recommender.authorID);
     await this.updateComplete;
 
-    updatePopperOverlay(this.paperOverlayElement, anchor, 'left', true, 10);
+    const updateOverlay = () => {
+      updatePopperOverlay(this.paperOverlayElement!, anchor, 'left', true, 10);
+    };
+
+    this.overlayCleanup = autoUpdate(
+      anchor,
+      this.paperOverlayElement,
+      updateOverlay
+    );
+
+    this.curClickedCiteTimeAuthorID = recommender.authorID;
     this.paperOverlayElement.classList.remove('hidden');
   }
 
@@ -448,6 +482,9 @@ export class RecRecRecommenderView extends LitElement {
     }
 
     this.paperOverlayElement.classList.add('hidden');
+    this.curClickedCiteTimeAuthorID = null;
+    this.overlayCleanup();
+    this.overlayCleanup = () => {};
   }
 
   //==========================================================================||
@@ -547,7 +584,8 @@ export class RecRecRecommenderView extends LitElement {
           <div class="control-section">
             <div class="control-block title-block">
               <span class="title"
-                >${this.curRecommendersSize} Recommenders</span
+                >${this.numberFormatter(this.curRecommendersSize)}
+                Recommenders</span
               >
             </div>
 
@@ -700,7 +738,8 @@ export const updatePopperOverlay = (
         offset(offsetAmount),
         flip(),
         shift(),
-        arrow({ element: arrowElement })
+        arrow({ element: arrowElement }),
+        hide()
       ]
     })
       .then(({ x, y, placement, middlewareData }) => {
@@ -719,17 +758,29 @@ export const updatePopperOverlay = (
         arrowElement.style.right = '';
         arrowElement.style.bottom = '';
         arrowElement.style[staticSide] = '-4px';
+
+        if (middlewareData.hide?.referenceHidden) {
+          tooltip.classList.add('hidden');
+        } else {
+          tooltip.classList.remove('hidden');
+        }
       })
       .catch(() => {});
   } else {
     arrowElement.classList.add('hidden');
     computePosition(anchor, tooltip, {
       placement: placement,
-      middleware: [offset(6), flip(), shift()]
+      middleware: [offset(6), flip(), shift(), hide()]
     })
-      .then(({ x, y }) => {
+      .then(({ x, y, middlewareData }) => {
         tooltip.style.left = `${x}px`;
         tooltip.style.top = `${y}px`;
+
+        if (middlewareData.hide?.referenceHidden) {
+          tooltip.classList.add('hidden');
+        } else {
+          tooltip.classList.remove('hidden');
+        }
       })
       .catch(() => {});
   }

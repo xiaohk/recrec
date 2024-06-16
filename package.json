@@ -14,8 +14,10 @@
   "devDependencies": {
     "@floating-ui/dom": "^1.6.5",
     "@shoelace-style/shoelace": "^2.15.1",
+    "@types/d3-format": "^3.0.4",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@xiaohk/utils": "^0.0.7",
+    "d3-format": "^3.1.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-lit": "^1.14.0",
