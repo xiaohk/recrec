@@ -466,6 +466,7 @@ export class RecRecRecommenderView extends LitElement {
     } else {
       this.sortBy = 'citeTimes';
     }
+    this.updateCitationView();
   }
 
   async showMoreButtonClicked() {
