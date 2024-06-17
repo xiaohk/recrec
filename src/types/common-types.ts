@@ -2,6 +2,21 @@
  * Type definitions
  */
 
+export enum AcademicAward {
+  AAAI_FELLOW = 'aaai-fellow',
+  ACM_FELLOW = 'acm-fellow',
+  AAAS_FELLOW = 'aaas-fellow',
+  ACM_DISSERTATION = 'acm-dissertation',
+  ACM_DISTINGUISHED = 'acm-distinguished-member',
+  ACM_GORDON = 'acm-gordon-bell',
+  ACM_GRACE = 'acm-grace-hopper',
+  ACM_SENIOR_MEMBER = 'acm-senior-member',
+  ACM_TURING = 'acm-turing',
+  AMACAD_MEMBER = 'aaa&s-member',
+  IEEE_FELLOW = 'ieee-fellow',
+  NAS_MEMBER = 'nas-member'
+}
+
 export interface SemanticCitationAuthor {
   authorId: string;
   name: string;

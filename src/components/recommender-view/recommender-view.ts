@@ -19,6 +19,7 @@ import { format } from 'd3-format';
 import { config } from '../../config/config';
 
 import {
+  AcademicAward,
   Step,
   SemanticAuthorDetail,
   SemanticPaper,
@@ -43,6 +44,20 @@ const SLIDER_STYLE = {
   backgroundColor: config.colors['blue-100'],
   alignInner: false
 };
+const AWARD_NAME_MAP: Record<AcademicAward, string> = {
+  [AcademicAward.AAAI_FELLOW]: 'AAAI Fellow',
+  [AcademicAward.AAAS_FELLOW]: 'AAAS Fellow',
+  [AcademicAward.ACM_DISSERTATION]: 'ACM Dissertation Award',
+  [AcademicAward.ACM_DISTINGUISHED]: 'ACM Distinguished Member',
+  [AcademicAward.ACM_FELLOW]: 'ACM Fellow',
+  [AcademicAward.ACM_GORDON]: 'ACM Gordon Bell Prize',
+  [AcademicAward.ACM_GRACE]: 'ACM Grace Hopper Award',
+  [AcademicAward.ACM_SENIOR_MEMBER]: 'ACM Senior Member',
+  [AcademicAward.ACM_TURING]: 'ACM Turing Award',
+  [AcademicAward.AMACAD_MEMBER]: 'AAA&S Member',
+  [AcademicAward.IEEE_FELLOW]: 'IEEE Fellow',
+  [AcademicAward.NAS_MEMBER]: 'NAS Member'
+};
 
 interface Recommender {
   authorID: string;
@@ -52,6 +67,7 @@ interface Recommender {
   hIndex?: number;
   citeTimes?: number;
   url?: string;
+  awards: string[];
 }
 
 interface SliderRange {
@@ -140,11 +156,15 @@ export class RecRecRecommenderView extends LitElement {
 
   numberFormatter = format(',');
 
+  // Awards
+  awardMap: Promise<Map<string, AcademicAward[]>>;
+
   //==========================================================================||
   //                             Lifecycle Methods                            ||
   //==========================================================================||
   constructor() {
     super();
+    this.awardMap = this.initData();
   }
 
   /**
@@ -176,11 +196,25 @@ export class RecRecRecommenderView extends LitElement {
   //==========================================================================||
   //                              Custom Methods                              ||
   //==========================================================================||
-  async initData() {}
+  async initData() {
+    const response = await fetch('/data/award-recipients.json');
+    const awardData = (await response.json()) as Record<
+      string,
+      AcademicAward[]
+    >;
+
+    // Convert the award data into a map
+    const awardMap = new Map<string, AcademicAward[]>();
+
+    for (const name of Object.keys(awardData)) {
+      const awards = awardData[name];
+      awardMap.set(name, awards);
+    }
+
+    return awardMap;
+  }
 
   async updateCitations() {
-    console.log('called');
-
     // Skip updating if the selected papers have not changed
     if (setsAreEqual(this.selectedPaperIDs, this.lastSelectedPaperIDs)) {
       return;
@@ -195,6 +229,7 @@ export class RecRecRecommenderView extends LitElement {
 
     // Map paper id => Map <citing author, cite count to that paper>
     const paperCitationAuthorMap = new Map<string, Map<string, number>>();
+    const awardMap = await this.awardMap;
 
     for (const paper of paperCitations) {
       const curCitingAuthorCiteTimes = new Map<string, number>();
@@ -220,11 +255,22 @@ export class RecRecRecommenderView extends LitElement {
             citationAuthorCount.set(author.authorId, 1);
           }
 
+          // Check if the author has any awards
+          const awards = [];
+          if (awardMap.has(author.name)) {
+            const awardNames = awardMap.get(author.name)!;
+            for (const name of awardNames) {
+              awards.push(AWARD_NAME_MAP[name]);
+            }
+          }
+          awards.sort((a, b) => a.localeCompare(b));
+
           // Update ID map
           if (!this.allAuthors.has(author.authorId)) {
             this.allAuthors.set(author.authorId, {
               authorID: author.authorId,
-              name: author.name
+              name: author.name,
+              awards: awards
             });
           }
         }
@@ -353,7 +399,8 @@ export class RecRecRecommenderView extends LitElement {
         hIndex: authorInfo.hIndex || 0,
         citeTimes: authorInfo.citeTimes,
         url: authorInfo.url,
-        affiliation: authorInfo.affiliation
+        affiliation: authorInfo.affiliation,
+        awards: authorInfo.awards
       };
       this.allRecommenders.push(recommender);
     }
@@ -527,6 +574,14 @@ export class RecRecRecommenderView extends LitElement {
             recommender.affiliation === ''}
           >
             ${recommender.affiliation}
+          </div>
+
+          <div
+            class="info-bar info-label info-award"
+            title=${recommender.awards.join(', ') || ''}
+            ?no-show=${recommender.awards.length === 0}
+          >
+            ${recommender.awards.join(', ')}
           </div>
 
           <div class="info-bar icons">

@@ -233,6 +233,11 @@
     padding-bottom: 2px;
   }
 
+  .info-award {
+    color: var(--orange-800);
+    white-space: wrap;
+  }
+
   .info-block {
     display: flex;
     align-items: center;
