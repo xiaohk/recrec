@@ -103,6 +103,7 @@ export class RecRecRecommenderView extends LitElement {
   citationAuthorCount = new Map<string, number>();
   allAuthors = new Map<string, Recommender>();
   paperCitingAuthorCountMap = new Map<string, Map<string, number>>();
+  myCollaborators = new Set<string>();
 
   allRecommenders: Recommender[] = [];
 
@@ -141,6 +142,13 @@ export class RecRecRecommenderView extends LitElement {
   sortBy: 'citeTimes' | 'hIndex' = 'citeTimes';
 
   curShownCardSizeMultiplier = 1;
+
+  @state()
+  filterToggles = {
+    excludeCollaborator: false,
+    haveAward: false,
+    haveAffiliation: false
+  };
 
   // Floating UIs
   @query('#popper-tooltip')
@@ -224,6 +232,14 @@ export class RecRecRecommenderView extends LitElement {
     console.time('Query citations');
     const paperCitations = await getPaperCitations([...this.selectedPaperIDs]);
     console.timeEnd('Query citations');
+
+    // Find and store collaborators
+    this.myCollaborators = new Set<string>();
+    for (const paper of this.papers) {
+      for (const author of paper.authors) {
+        this.myCollaborators.add(author.authorId);
+      }
+    }
 
     // Count the authors in the citations
     const citationAuthorCount = new Map<string, number>();
@@ -419,9 +435,30 @@ export class RecRecRecommenderView extends LitElement {
         console.error(`Author ${recommender.authorID}'s info is incomplete.`);
       }
 
+      // Slider filters
+      const hIndexOK = recommender.hIndex! >= this.hIndexRange.curValue;
+      const citeTimesOK =
+        recommender.citeTimes! >= this.citationTimeRange.curValue;
+
+      // Checkbox filters
+      const excludeCollaboratorOK =
+        !this.filterToggles.excludeCollaborator ||
+        !this.myCollaborators.has(recommender.authorID);
+
+      const haveAwardOK =
+        !this.filterToggles.haveAward || recommender.awards.length > 0;
+
+      const haveAffiliationOK =
+        !this.filterToggles.haveAffiliation ||
+        (recommender.affiliation !== '' &&
+          recommender.affiliation !== undefined);
+
       if (
-        recommender.hIndex! >= this.hIndexRange.curValue &&
-        recommender.citeTimes! >= this.citationTimeRange.curValue
+        hIndexOK &&
+        citeTimesOK &&
+        excludeCollaboratorOK &&
+        haveAwardOK &&
+        haveAffiliationOK
       ) {
         recommenders.push(recommender);
       }
@@ -540,6 +577,32 @@ export class RecRecRecommenderView extends LitElement {
     this.curClickedCiteTimeAuthorID = null;
     this.overlayCleanup();
     this.overlayCleanup = () => {};
+  }
+
+  checkboxInput(e: InputEvent) {
+    const curElement = e.currentTarget as HTMLElement;
+
+    const collaboratorCheckbox = curElement.querySelector(
+      '#checkbox-collaboration'
+    ) as HTMLInputElement;
+
+    const awardCheckbox = curElement.querySelector(
+      '#checkbox-award'
+    ) as HTMLInputElement;
+
+    const affiliationCheckbox = curElement.querySelector(
+      '#checkbox-affiliation'
+    ) as HTMLInputElement;
+
+    if (!collaboratorCheckbox || !awardCheckbox || !affiliationCheckbox) {
+      throw Error('Checkboxes are not initialized');
+    }
+
+    this.filterToggles.excludeCollaborator = collaboratorCheckbox.checked;
+    this.filterToggles.haveAward = awardCheckbox.checked;
+    this.filterToggles.haveAffiliation = affiliationCheckbox.checked;
+
+    this.updateCitationView();
   }
 
   //==========================================================================||
@@ -703,7 +766,10 @@ export class RecRecRecommenderView extends LitElement {
 
           <div class="separator"></div>
 
-          <div class="control-section ">
+          <div
+            class="control-section "
+            @input=${(e: InputEvent) => this.checkboxInput(e)}
+          >
             <div class="control-block checkbox-block">
               <div class="checkbox-wrapper">
                 <input type="checkbox" id="checkbox-collaboration" />
