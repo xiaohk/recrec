@@ -42,6 +42,7 @@ const MAX_RECOMMENDER_NUM = 500;
 const SLIDER_STYLE = {
   foregroundColor: config.colors['blue-700'],
   backgroundColor: config.colors['blue-100'],
+  thumbColor: config.colors['blue-700'],
   alignInner: false
 };
 const AWARD_NAME_MAP: Record<AcademicAward, string> = {
@@ -450,6 +451,9 @@ export class RecRecRecommenderView extends LitElement {
     const newHIndexRange = { ...this.hIndexRange };
     newHIndexRange.curValue = count;
     this.hIndexRange = newHIndexRange;
+
+    // Trigger a new recommender view update
+    this.updateCitationView();
   }
 
   citeMeSliderChanged(e: CustomEvent<number>) {
@@ -457,6 +461,9 @@ export class RecRecRecommenderView extends LitElement {
     const newCitationTimeRange = { ...this.citationTimeRange };
     newCitationTimeRange.curValue = count;
     this.citationTimeRange = newCitationTimeRange;
+
+    // Trigger a new recommender view update
+    this.updateCitationView();
   }
 
   selectChanged(e: InputEvent) {
@@ -708,15 +715,15 @@ export class RecRecRecommenderView extends LitElement {
 
             <div class="control-block checkbox-block">
               <div class="checkbox-wrapper">
-                <input type="checkbox" id="checkbox-affiliation" />
-                <label for="checkbox-affiliation">Have affiliation</label>
+                <input type="checkbox" id="checkbox-award" />
+                <label for="checkbox-award">Have awards</label>
               </div>
             </div>
 
             <div class="control-block checkbox-block">
               <div class="checkbox-wrapper">
-                <input type="checkbox" id="checkbox-award" />
-                <label for="checkbox-award">Have awards</label>
+                <input type="checkbox" id="checkbox-affiliation" />
+                <label for="checkbox-affiliation">Have affiliation</label>
               </div>
             </div>
           </div>

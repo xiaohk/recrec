@@ -8,6 +8,7 @@ import componentCSS from './slider.css?inline';
 export interface SliderStyleConfig {
   foregroundColor: string;
   backgroundColor: string;
+  thumbColor: string;
   alignInner: boolean;
 }
 
@@ -162,9 +163,10 @@ export class NightjarSlider extends LitElement {
   render() {
     const cssVariables = {
       '--foreground-color':
-        this.styleConfig?.foregroundColor || 'hsl(174, 41.28%, 78.63%)',
+        this.styleConfig?.foregroundColor || 'hsl(174, 100%, 29.41%)',
       '--background-color':
-        this.styleConfig?.backgroundColor || 'hsl(174, 100%, 29.41%)'
+        this.styleConfig?.backgroundColor || 'hsl(174, 41.28%, 78.63%)',
+      '--thumb-color': this.styleConfig?.thumbColor || 'hsl(174, 100%, 29.41%)'
     };
 
     return html`
