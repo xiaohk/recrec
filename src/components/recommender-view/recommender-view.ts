@@ -375,7 +375,6 @@ export class RecRecRecommenderView extends LitElement {
       // this.completedStep = this.totalStep;
       // break;
     }
-    console.log(minHIndex, maxHIndex, minCitationTimes, maxCitationTimes);
 
     console.timeEnd('Fetching authors');
 
@@ -679,6 +678,22 @@ export class RecRecRecommenderView extends LitElement {
         </div> `;
     }
 
+    // Recommender empty placeholder
+    const recommenderEmptyView = html`
+      <div
+        class="recommender-empty-placeholder"
+        ?no-show=${this.curRecommendersSize > 0}
+      >
+        <div class="text-icon">(｡•́︿•̀｡)</div>
+        <div class="title">No Recommender Found</div>
+        <div class="description">
+          It looks like your filters are too restrictive, and no recommenders
+          match all the selected criteria. Please try adjusting or removing some
+          filters to see more options.
+        </div>
+      </div>
+    `;
+
     // Compile the progress overlay
     const progressRing = html`
       <div
@@ -796,6 +811,7 @@ export class RecRecRecommenderView extends LitElement {
         </div>
 
         <div class="right-content">
+          ${recommenderEmptyView}
           <div class="recommender-content">${recommenderCards}</div>
 
           <div class="footer">

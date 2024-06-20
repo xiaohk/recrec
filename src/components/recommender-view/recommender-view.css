@@ -160,6 +160,7 @@
 }
 
 .right-content {
+  position: relative;
   flex: 1;
   box-sizing: border-box;
   padding: var(--container-v-padding) var(--container-h-padding);
@@ -181,6 +182,41 @@
   justify-content: flex-start;
   align-items: stretch;
   gap: 14px;
+}
+
+.recommender-empty-placeholder {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  text-align: center;
+
+  &[no-show] {
+    display: none;
+  }
+
+  .text-icon {
+    font-size: 50px;
+    font-weight: 600;
+    color: var(--gray-400);
+  }
+
+  .title {
+    font-size: 20px;
+    font-weight: 500;
+    padding: 10px 0 5px 0;
+  }
+
+  .description {
+    max-width: 60ch;
+    color: var(--gray-600);
+  }
 }
 
 .recommender-card {

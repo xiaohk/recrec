@@ -4,6 +4,7 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import '../recrec/recrec';
 
 import componentCSS from './page.css?inline';
+import recrecIcon from '../../images/recrec-logo.svg?raw';
 
 /**
  * Page element.
@@ -51,6 +52,21 @@ export class RecRecPage extends LitElement {
   render() {
     return html`
       <div class="page">
+        <div class="headline">
+          <div class="head-group">
+            <div class="svg-icon">${unsafeHTML(recrecIcon)}</div>
+            <div class="tag-line">
+              Recommender for Recommendation Letter Writers
+            </div>
+          </div>
+
+          <div class="head-group">
+            <a href="https://zijie.wang" target="_blank" class="button"
+              >By Jay Wang</a
+            >
+            <a href="https://zijie.wang" target="_blank" class="button">Code</a>
+          </div>
+        </div>
         <div class="app-container"><recrec-app></recrec-app></div>
       </div>
     `;
