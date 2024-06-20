@@ -77,12 +77,14 @@ export class RecRecHeaderBar extends LitElement {
       <div class="header-bar">
         <button
           class="svg-icon move-pre"
+          ?disabled=${this.curStep === Step.Author}
           @click=${() => {
             this.notifyParentMoveStep('pre');
           }}
         >
           ${unsafeHTML(iconCaret)}
         </button>
+
         <div class="title-middle">
           <span class="step-info"
             >Step ${this.curStepIndex + 1}/${steps.length}:</span
@@ -92,6 +94,7 @@ export class RecRecHeaderBar extends LitElement {
 
         <button
           class="svg-icon move-next"
+          ?disabled=${this.curStep === Step.Recommender}
           @click=${() => {
             this.notifyParentMoveStep('next');
           }}

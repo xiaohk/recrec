@@ -20,6 +20,19 @@
 button {
   all: unset;
   cursor: pointer;
+
+  &[disabled] {
+    cursor: no-drop;
+    opacity: 0.5;
+  }
+}
+
+.move-pre {
+  transform: rotate(90deg);
+}
+
+.move-next {
+  transform: rotate(-90deg);
 }
 
 .svg-icon {
@@ -57,12 +70,4 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.move-pre {
-  transform: rotate(90deg);
-}
-
-.move-next {
-  transform: rotate(-90deg);
 }
