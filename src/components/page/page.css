@@ -29,10 +29,11 @@
   cursor: default;
 
   .tag-line {
-    font-size: 20px;
+    font-size: 24px;
     padding-top: 20px;
-    color: var(--gray-800);
+    color: var(--blue-900);
     margin-left: -15px;
+    font-weight: 600;
   }
 
   .head-group {
@@ -65,7 +66,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 20px;
+    padding-top: 25px;
     box-sizing: border-box;
   }
 }

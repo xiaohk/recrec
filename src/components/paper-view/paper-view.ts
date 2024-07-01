@@ -27,6 +27,8 @@ export class RecRecPaperView extends LitElement {
   @state()
   selectedPaperIDs: Set<string> = new Set();
 
+  lastClickedHeader: '' | 'title' | 'citedBy' | 'year' = '';
+
   //==========================================================================||
   //                             Lifecycle Methods                            ||
   //==========================================================================||
@@ -148,6 +150,60 @@ export class RecRecPaperView extends LitElement {
     this.dispatchEvent(event);
   }
 
+  headerButtonClicked(button: 'title' | 'citedBy' | 'year') {
+    // Sort the papers based on the clicked button
+    const papers = this.papers.slice();
+    switch (button) {
+      case 'title': {
+        if (this.lastClickedHeader == 'title') {
+          papers.sort((a, b) => b.title.localeCompare(a.title));
+          this.lastClickedHeader = '';
+        } else {
+          papers.sort((a, b) => a.title.localeCompare(b.title));
+          this.lastClickedHeader = 'title';
+        }
+
+        this.papers = papers;
+        break;
+      }
+
+      case 'citedBy': {
+        if (this.lastClickedHeader == 'citedBy') {
+          papers.sort((a, b) => a.citationCount - b.citationCount);
+          this.lastClickedHeader = '';
+        } else {
+          papers.sort((a, b) => b.citationCount - a.citationCount);
+          this.lastClickedHeader = 'citedBy';
+        }
+
+        break;
+      }
+
+      case 'year': {
+        if (this.lastClickedHeader == 'year') {
+          papers.sort((a, b) =>
+            a.publicationDate.localeCompare(b.publicationDate)
+          );
+          this.lastClickedHeader = '';
+        } else {
+          papers.sort((a, b) =>
+            b.publicationDate.localeCompare(a.publicationDate)
+          );
+          this.lastClickedHeader = 'year';
+        }
+
+        break;
+      }
+
+      default: {
+        console.error('Unknown sorting order clicked.');
+        break;
+      }
+    }
+
+    this.papers = papers;
+  }
+
   //==========================================================================||
   //                           Templates and Styles                           ||
   //==========================================================================||
@@ -198,12 +254,23 @@ export class RecRecPaperView extends LitElement {
                   />
                 </th>
                 <th class="title-cell header-cell">
-                  <button class="header-button">Title</button>
+                  <button
+                    class="header-button"
+                    @click=${() => this.headerButtonClicked('title')}
+                  >
+                    Title
+                  </button>
                 </th>
-                <th class="citation-cell header-cell">
+                <th
+                  class="citation-cell header-cell"
+                  @click=${() => this.headerButtonClicked('citedBy')}
+                >
                   <button class="header-button">Cited By</button>
                 </th>
-                <th class="date-cell header-cell">
+                <th
+                  class="date-cell header-cell"
+                  @click=${() => this.headerButtonClicked('year')}
+                >
                   <button class="header-button">Year</button>
                 </th>
               </tr>

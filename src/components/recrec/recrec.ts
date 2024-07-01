@@ -26,7 +26,7 @@ export class RecRecApp extends LitElement {
   //                              Class Properties                            ||
   //==========================================================================||
   @state()
-  curStep: Step = Step.Recommender;
+  curStep: Step = Step.Paper;
 
   @state()
   selectedProfile: SemanticAuthorDetail | null = null;
