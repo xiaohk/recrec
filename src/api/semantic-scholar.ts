@@ -20,7 +20,7 @@ import authorCitationSearchMockJSON6 from '../../test/api-responses/author-citat
 import authorCitationSearchMockJSON7 from '../../test/api-responses/author-citation-search-8-7.json';
 import authorCitationSearchMockJSON8 from '../../test/api-responses/author-citation-search-8-8.json';
 
-const MOCK_HTTP_CALL = true;
+const MOCK_HTTP_CALL = false;
 
 const paperSearchMock = paperSearchMockJSON as SemanticPaperSearchResponse;
 const citationSearchMock =
@@ -146,7 +146,9 @@ export const getAllPapersFromAuthor = async (authorID: string) => {
     const data = (await response.json()) as SemanticPaperSearchResponse;
 
     // Append the paper data
-    data.data.forEach(d => papers.push(d));
+    data.data.forEach(d => {
+      papers.push(d);
+    });
 
     // Keep fetching until retrieving all the papers
     if (data.next !== undefined) {
@@ -154,6 +156,8 @@ export const getAllPapersFromAuthor = async (authorID: string) => {
     } else {
       isComplete = true;
     }
+
+    console.log(papers.length, data, isComplete);
   }
 
   return papers;

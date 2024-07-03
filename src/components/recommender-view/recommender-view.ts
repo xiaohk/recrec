@@ -194,12 +194,12 @@ export class RecRecRecommenderView extends LitElement {
     }
 
     // TODO: Remove this after developing this component
-    if (changedProperties.has('selectedPaperIDs')) {
-      this.updateCitations().then(
-        () => {},
-        () => {}
-      );
-    }
+    // if (changedProperties.has('selectedPaperIDs')) {
+    //   this.updateCitations().then(
+    //     () => {},
+    //     () => {}
+    //   );
+    // }
   }
 
   //==========================================================================||
@@ -475,8 +475,6 @@ export class RecRecRecommenderView extends LitElement {
       0,
       MAX_RECOMMENDER_NUM * this.curShownCardSizeMultiplier
     );
-
-    console.log('Cur-recommenders updated');
   }
 
   //==========================================================================||
@@ -611,8 +609,8 @@ export class RecRecRecommenderView extends LitElement {
     const paperCounts: [string, number][] = [];
 
     for (const paper of this.papers) {
-      const countMap = this.paperCitingAuthorCountMap.get(paper.paperId)!;
-      if (countMap.has(authorID)) {
+      const countMap = this.paperCitingAuthorCountMap.get(paper.paperId);
+      if (countMap !== undefined && countMap.has(authorID)) {
         paperCounts.push([paper.title, countMap.get(authorID)!]);
       }
     }

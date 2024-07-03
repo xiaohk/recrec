@@ -26,7 +26,7 @@ export class RecRecApp extends LitElement {
   //                              Class Properties                            ||
   //==========================================================================||
   @state()
-  curStep: Step = Step.Paper;
+  curStep: Step = Step.Author;
 
   @state()
   selectedProfile: SemanticAuthorDetail | null = null;
@@ -40,19 +40,22 @@ export class RecRecApp extends LitElement {
   @state()
   selectedPaperIDs = new Set<string>();
 
+  @state()
+  confirmedSelectedPaperIDs = new Set<string>();
+
   //==========================================================================||
   //                             Lifecycle Methods                            ||
   //==========================================================================||
   constructor() {
     super();
-    this.selectedProfile = {
-      authorId: '1390877819',
-      name: 'Zijie J. Wang',
-      affiliations: ['Georgia Tech'],
-      homepage: 'https://zijie.wang',
-      paperCount: 42,
-      citationCount: 1716
-    };
+    // this.selectedProfile = {
+    //   authorId: '1390877819',
+    //   name: 'Zijie J. Wang',
+    //   affiliations: ['Georgia Tech'],
+    //   homepage: 'https://zijie.wang',
+    //   paperCount: 42,
+    //   citationCount: 1716
+    // };
   }
 
   /**
@@ -101,6 +104,10 @@ export class RecRecApp extends LitElement {
       throw Error(`There is no more step after this step: ${this.curStep}`);
     }
     this.curStep = steps[curIndex + 1];
+
+    if (this.curStep === Step.Recommender) {
+      this.confirmedSelectedPaperIDs = this.selectedPaperIDs;
+    }
   }
 
   //==========================================================================||
@@ -140,7 +147,7 @@ export class RecRecApp extends LitElement {
         ?no-show=${this.curStep !== Step.Recommender}
         .curStep=${this.curStep}
         .papers=${this.papers}
-        .selectedPaperIDs=${this.selectedPaperIDs}
+        .selectedPaperIDs=${this.confirmedSelectedPaperIDs}
         .selectedProfile=${this.selectedProfile}
       ></recrec-recommender-view>
     `;

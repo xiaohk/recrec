@@ -32,14 +32,14 @@
     font-size: 24px;
     padding-top: 20px;
     color: var(--blue-900);
-    margin-left: -15px;
-    font-weight: 600;
+    margin-left: -20px;
+    font-weight: 500;
   }
 
   .head-group {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 24px;
   }
 
   a.button {

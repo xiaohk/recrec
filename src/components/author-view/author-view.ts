@@ -64,7 +64,7 @@ export class RecRecAuthorView extends LitElement {
   //==========================================================================||
   //                              Event Handlers                              ||
   //==========================================================================||
-  searchInput(e: InputEvent, delay = 400) {
+  searchInput(e: InputEvent, delay = 200) {
     const target = e.currentTarget as HTMLInputElement;
     const query = target.value;
 
@@ -126,8 +126,6 @@ export class RecRecAuthorView extends LitElement {
     } else {
       this.showAuthorList = false;
     }
-
-    console.log(data);
   }
 
   authorRowClickedHandler(e: CustomEvent<SemanticAuthorDetail>) {

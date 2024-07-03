@@ -27,6 +27,9 @@ export class RecRecPaperView extends LitElement {
   @state()
   selectedPaperIDs: Set<string> = new Set();
 
+  @state()
+  isCompleted = false;
+
   lastClickedHeader: '' | 'title' | 'citedBy' | 'year' = '';
 
   //==========================================================================||
@@ -67,10 +70,12 @@ export class RecRecPaperView extends LitElement {
       return;
     }
 
+    this.isCompleted = false;
     const papers = await getAllPapersFromAuthor(this.selectedProfile.authorId);
 
     // Sort the papers by publication date first
-    papers.sort((a, b) => b.publicationDate.localeCompare(a.publicationDate));
+    papers.sort((a, b) => comparePaperDate(b, a));
+    this.lastClickedHeader = 'year';
     this.papers = papers;
 
     // Select all papers by default
@@ -82,6 +87,7 @@ export class RecRecPaperView extends LitElement {
     this.notifyParentSelectedPapers(this.selectedPaperIDs);
     this.notifyParentPapers(this.papers);
 
+    this.isCompleted = true;
     console.log(this.papers);
   }
 
@@ -181,17 +187,12 @@ export class RecRecPaperView extends LitElement {
 
       case 'year': {
         if (this.lastClickedHeader == 'year') {
-          papers.sort((a, b) =>
-            a.publicationDate.localeCompare(b.publicationDate)
-          );
+          papers.sort((a, b) => comparePaperDate(a, b));
           this.lastClickedHeader = '';
         } else {
-          papers.sort((a, b) =>
-            b.publicationDate.localeCompare(a.publicationDate)
-          );
+          papers.sort((a, b) => comparePaperDate(b, a));
           this.lastClickedHeader = 'year';
         }
-
         break;
       }
 
@@ -236,6 +237,13 @@ export class RecRecPaperView extends LitElement {
           <td class="date-cell">${paper.year}</td>
         </tr> `;
     }
+
+    // Compile the progress overlay
+    const progressRing = html`
+      <div class="progress-overlay" ?is-completed=${this.isCompleted}>
+        <span class="progress-message">Fetching author details...</span>
+      </div>
+    `;
 
     return html`
       <div class="paper-view">
@@ -307,3 +315,7 @@ declare global {
     'recrec-paper-view': RecRecPaperView;
   }
 }
+
+const comparePaperDate = (a: SemanticPaper, b: SemanticPaper) => {
+  return (a.year | 0) - (b.year | 0);
+};
