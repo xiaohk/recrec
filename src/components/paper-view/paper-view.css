@@ -44,6 +44,7 @@
   .selected-cell {
     position: relative;
     vertical-align: top;
+    text-align: center;
     padding: var(--table-v-padding) var(--table-h-padding) 0
       var(--container-h-padding);
 

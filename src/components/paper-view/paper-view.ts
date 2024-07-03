@@ -254,12 +254,14 @@ export class RecRecPaperView extends LitElement {
                 <th class="selected-cell header-cell">
                   <input
                     class="paper-checkbox"
+                    id="checkbox-all"
                     type="checkbox"
                     .checked=${this.papers.length ===
                     this.selectedPaperIDs.size}
                     @change=${(e: InputEvent) =>
                       this.selectAllCheckboxChanged(e)}
                   />
+                  <label for="checkbox-all"></label>
                 </th>
                 <th class="title-cell header-cell">
                   <button
@@ -317,5 +319,7 @@ declare global {
 }
 
 const comparePaperDate = (a: SemanticPaper, b: SemanticPaper) => {
-  return (a.year | 0) - (b.year | 0);
+  const aDate = a.publicationDate || `${a.year || '0000'}-01-01`;
+  const bDate = b.publicationDate || `${b.year || '0000'}-01-01`;
+  return aDate.localeCompare(bDate);
 };
