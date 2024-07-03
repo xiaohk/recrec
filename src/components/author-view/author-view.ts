@@ -130,6 +130,11 @@ export class RecRecAuthorView extends LitElement {
 
   authorRowClickedHandler(e: CustomEvent<SemanticAuthorDetail>) {
     this.selectedProfile = e.detail;
+
+    // Also fill the input with the selected author
+    if (this.searchInputComponent) {
+      this.searchInputComponent.value = this.selectedProfile!.name!;
+    }
   }
 
   confirmButtonClicked() {
