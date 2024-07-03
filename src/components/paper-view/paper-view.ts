@@ -74,8 +74,13 @@ export class RecRecPaperView extends LitElement {
     const papers = await getAllPapersFromAuthor(this.selectedProfile.authorId);
 
     // Sort the papers by publication date first
-    papers.sort((a, b) => comparePaperDate(b, a));
-    this.lastClickedHeader = 'year';
+    // papers.sort((a, b) => comparePaperDate(b, a));
+    // this.lastClickedHeader = 'year';
+
+    // Sort the papers by citation count first
+    papers.sort((a, b) => b.citationCount - a.citationCount);
+    this.lastClickedHeader = 'citedBy';
+
     this.papers = papers;
 
     // Select all papers by default

@@ -160,7 +160,7 @@ export class RecRecAuthorView extends LitElement {
             <sl-input
               type="search"
               size="medium"
-              placeholder="Search Semantic Scholar profiles"
+              placeholder="Type your name to search your Semantic Scholar profile"
               spellcheck="false"
               clearable
               @sl-input=${(e: InputEvent) => this.searchInput(e)}

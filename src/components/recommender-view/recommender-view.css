@@ -328,20 +328,12 @@
       content: '';
       animation: dot 300ms linear infinite;
     }
+  }
 
-    @keyframes dot {
-      0%: {
-        content: '.';
-      }
-
-      33%: {
-        content: '..';
-      }
-
-      66%: {
-        content: '...';
-      }
-    }
+  .progress-remain-time {
+    font-style: italic;
+    color: var(--gray-500);
+    margin-top: -6px;
   }
 }
 

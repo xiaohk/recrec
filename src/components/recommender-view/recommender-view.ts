@@ -39,6 +39,7 @@ import iconCiteTimes from '../../images/icon-cite-times-c.svg?raw';
 
 const DEV_MODE = true;
 const MAX_RECOMMENDER_NUM = 500;
+const DEFAULT_REMAIN_TIME = 30000;
 const SLIDER_STYLE = {
   foregroundColor: config.colors['blue-700'],
   backgroundColor: config.colors['blue-100'],
@@ -118,6 +119,9 @@ export class RecRecRecommenderView extends LitElement {
 
   @state()
   completedStep = 0;
+
+  @state()
+  remainTimeMS = DEFAULT_REMAIN_TIME;
 
   // Slider ranges
   @state()
@@ -201,15 +205,25 @@ export class RecRecRecommenderView extends LitElement {
       this.curStep === Step.Recommender &&
       !setsAreEqual(this.selectedPaperIDs, this.checkedSelectedPaperIDs)
     ) {
+      // Reset mappings
+      this.citationAuthorCount = new Map<string, number>();
+      this.allAuthors = new Map<string, Recommender>();
+      this.paperCitingAuthorCountMap = new Map<string, Map<string, number>>();
+      this.myCollaborators = new Set<string>();
+
       this.updateCitations().then(
         () => {},
         () => {}
       );
     }
 
-    if (changedProperties.has('selectedProfile')) {
+    if (
+      changedProperties.has('selectedProfile') ||
+      changedProperties.has('selectedPaperIDs')
+    ) {
       this.completedStep = 0;
       this.totalStep = 1;
+      this.remainTimeMS = DEFAULT_REMAIN_TIME;
     }
   }
 
@@ -238,12 +252,6 @@ export class RecRecRecommenderView extends LitElement {
     console.time('Query citations');
     const paperCitations = await getPaperCitations([...this.selectedPaperIDs]);
     console.timeEnd('Query citations');
-
-    // Reset mappings
-    this.citationAuthorCount = new Map<string, number>();
-    this.allAuthors = new Map<string, Recommender>();
-    this.paperCitingAuthorCountMap = new Map<string, Map<string, number>>();
-    this.myCollaborators = new Set<string>();
 
     // Find and store collaborators
     for (const paper of this.papers) {
@@ -335,6 +343,8 @@ export class RecRecRecommenderView extends LitElement {
     // Update the progress ring info
     this.totalStep = authorIDChunks.length + 1;
     this.completedStep = 1;
+    // 3000ms is the approximated time to finish one request
+    this.remainTimeMS = 3000 * this.totalStep;
 
     // Semantic scholar only supports up to 1000 authors in one batch, we use
     // chunks to query information of all authors
@@ -347,6 +357,7 @@ export class RecRecRecommenderView extends LitElement {
 
     for (const [i, chunk] of authorIDChunks.entries()) {
       console.log(`Chunk: ${i}`);
+      const startTime = performance.now();
 
       const curResult = await searchAuthorDetails(chunk, field);
 
@@ -377,11 +388,15 @@ export class RecRecRecommenderView extends LitElement {
 
       // Short delay between consecutive API calls
       await new Promise<void>(resolve => {
-        setTimeout(resolve, DEV_MODE ? 0 : 1000);
+        setTimeout(resolve, DEV_MODE ? 0 : 500);
       });
+
+      const endTime = performance.now();
 
       // Update progress ring
       this.completedStep += 1;
+      this.remainTimeMS =
+        (endTime - startTime) * (this.totalStep - this.completedStep);
     }
 
     console.timeEnd('Fetching authors');
@@ -712,6 +727,9 @@ export class RecRecRecommenderView extends LitElement {
           value=${(this.completedStep / this.totalStep) * 100}
         ></sl-progress-ring>
         <span class="progress-message">Fetching author details...</span>
+        <span class="progress-remain-time"
+          >${formatRemainTime(this.remainTimeMS)} left</span
+        >
       </div>
     `;
 
@@ -937,4 +955,26 @@ export const updatePopperOverlay = (
       })
       .catch(() => {});
   }
+};
+
+const formatRemainTime = (milliseconds: number): string => {
+  let remainingTime = milliseconds;
+  const hours = Math.floor(remainingTime / (1000 * 60 * 60));
+  remainingTime %= 1000 * 60 * 60;
+  const minutes = Math.floor(remainingTime / (1000 * 60));
+  remainingTime %= 1000 * 60;
+  const seconds = Math.floor(remainingTime / 1000);
+
+  let result = '';
+  if (hours > 0) {
+    result += `${hours} hour${hours !== 1 ? 's' : ''}, `;
+  }
+  if (minutes > 0) {
+    result += `${minutes} minute${minutes !== 1 ? 's' : ''}, `;
+  }
+  if (seconds > 0) {
+    result += `${seconds} second${seconds !== 1 ? 's' : ''} `;
+  }
+
+  return result;
 };
