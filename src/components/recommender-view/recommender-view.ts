@@ -97,18 +97,17 @@ export class RecRecRecommenderView extends LitElement {
 
   @property({ attribute: false })
   selectedPaperIDs = new Set<string>();
+  checkedSelectedPaperIDs = new Set<string>();
 
-  lastSelectedPaperIDs = new Set<string>();
+  citationAuthorCount: Map<string, number>;
+  allAuthors: Map<string, Recommender>;
+  paperCitingAuthorCountMap: Map<string, Map<string, number>>;
+  myCollaborators: Set<string>;
 
-  citationAuthorCount = new Map<string, number>();
-  allAuthors = new Map<string, Recommender>();
-  paperCitingAuthorCountMap = new Map<string, Map<string, number>>();
-  myCollaborators = new Set<string>();
-
-  allRecommenders: Recommender[] = [];
+  allRecommenders: Recommender[];
 
   @state()
-  shownRecommenders: Recommender[] = [];
+  shownRecommenders: Recommender[];
 
   @state()
   curRecommendersSize = 0;
@@ -158,7 +157,7 @@ export class RecRecRecommenderView extends LitElement {
   paperOverlayElement: HTMLElement | undefined;
 
   @state()
-  overlayPaperCounts: [string, number][] = [];
+  overlayPaperCounts: [string, number][];
 
   curClickedCiteTimeAuthorID: string | null = null;
   overlayCleanup = () => {};
@@ -173,6 +172,17 @@ export class RecRecRecommenderView extends LitElement {
   //==========================================================================||
   constructor() {
     super();
+
+    this.citationAuthorCount = new Map<string, number>();
+    this.allAuthors = new Map<string, Recommender>();
+    this.paperCitingAuthorCountMap = new Map<string, Map<string, number>>();
+    this.myCollaborators = new Set<string>();
+
+    this.allRecommenders = [];
+    this.shownRecommenders = [];
+
+    this.overlayPaperCounts = [];
+
     this.awardMap = this.initData();
   }
 
@@ -186,20 +196,21 @@ export class RecRecRecommenderView extends LitElement {
    * @param changedProperties Property that has been changed
    */
   willUpdate(changedProperties: PropertyValues<this>) {
-    if (changedProperties.has('curStep') && this.curStep === Step.Recommender) {
+    if (
+      changedProperties.has('curStep') &&
+      this.curStep === Step.Recommender &&
+      !setsAreEqual(this.selectedPaperIDs, this.checkedSelectedPaperIDs)
+    ) {
       this.updateCitations().then(
         () => {},
         () => {}
       );
     }
 
-    // TODO: Remove this after developing this component
-    // if (changedProperties.has('selectedPaperIDs')) {
-    //   this.updateCitations().then(
-    //     () => {},
-    //     () => {}
-    //   );
-    // }
+    if (changedProperties.has('selectedProfile')) {
+      this.completedStep = 0;
+      this.totalStep = 1;
+    }
   }
 
   //==========================================================================||
@@ -224,17 +235,17 @@ export class RecRecRecommenderView extends LitElement {
   }
 
   async updateCitations() {
-    // Skip updating if the selected papers have not changed
-    if (setsAreEqual(this.selectedPaperIDs, this.lastSelectedPaperIDs)) {
-      return;
-    }
-
     console.time('Query citations');
     const paperCitations = await getPaperCitations([...this.selectedPaperIDs]);
     console.timeEnd('Query citations');
 
-    // Find and store collaborators
+    // Reset mappings
+    this.citationAuthorCount = new Map<string, number>();
+    this.allAuthors = new Map<string, Recommender>();
+    this.paperCitingAuthorCountMap = new Map<string, Map<string, number>>();
     this.myCollaborators = new Set<string>();
+
+    // Find and store collaborators
     for (const paper of this.papers) {
       for (const author of paper.authors) {
         this.myCollaborators.add(author.authorId);
@@ -371,9 +382,6 @@ export class RecRecRecommenderView extends LitElement {
 
       // Update progress ring
       this.completedStep += 1;
-
-      // this.completedStep = this.totalStep;
-      // break;
     }
 
     console.timeEnd('Fetching authors');
@@ -384,6 +392,8 @@ export class RecRecRecommenderView extends LitElement {
 
     this.citationTimeRange.min = minCitationTimes;
     this.citationTimeRange.max = maxCitationTimes;
+
+    this.checkedSelectedPaperIDs = structuredClone(this.selectedPaperIDs);
 
     // Update the view
     this.initCitationView();

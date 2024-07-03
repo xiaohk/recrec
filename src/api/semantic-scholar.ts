@@ -156,8 +156,6 @@ export const getAllPapersFromAuthor = async (authorID: string) => {
     } else {
       isComplete = true;
     }
-
-    console.log(papers.length, data, isComplete);
   }
 
   return papers;
