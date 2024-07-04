@@ -246,12 +246,15 @@ export class RecRecPaperView extends LitElement {
     // Compile the progress overlay
     const progressRing = html`
       <div class="progress-overlay" ?is-completed=${this.isCompleted}>
-        <span class="progress-message">Fetching author details...</span>
+        <div class="loader"></div>
+        <span class="progress-message">Fetching paper details...</span>
       </div>
     `;
 
     return html`
       <div class="paper-view">
+        ${progressRing}
+
         <div class="table-container">
           <table class="paper-table">
             <thead>
