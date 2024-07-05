@@ -87,7 +87,7 @@ export class RecRecHeaderBar extends LitElement {
 
         <div class="title-middle">
           <span class="step-info"
-            >Step ${this.curStepIndex + 1}/${steps.length}:</span
+            >Step ${this.curStepIndex + 1}/${steps.length}</span
           >
           <span class="title">${titleString[this.curStep]}</span>
         </div>

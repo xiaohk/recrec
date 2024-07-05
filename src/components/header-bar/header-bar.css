@@ -56,13 +56,17 @@ button {
 .title-middle {
   display: flex;
   align-items: center;
-  font-weight: 500;
+  font-weight: 600;
   font-size: var(--font-u2);
-  gap: 5px;
+  gap: 10px;
   cursor: default;
 
   .step-info {
     font-variant-numeric: tabular-nums;
+
+    border-radius: 5px;
+    padding: 0px 8px;
+    background-color: hsla(0, 0%, 100%, 0.15);
   }
 }
 
