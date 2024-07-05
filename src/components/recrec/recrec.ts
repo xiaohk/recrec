@@ -110,6 +110,10 @@ export class RecRecApp extends LitElement {
     }
   }
 
+  jumpToStep(step: Step) {
+    this.curStep = step;
+  }
+
   //==========================================================================||
   //                           Templates and Styles                           ||
   //==========================================================================||
@@ -165,20 +169,29 @@ export class RecRecApp extends LitElement {
           <div class="info-bar">
             <div class="info-block">
               <span>My Profile:</span>
-              <span
+              <button
                 class="profile-name"
+                @click=${() => {
+                  this.jumpToStep(Step.Author);
+                }}
                 ?is-unset=${this.selectedProfile === null}
-                >${this.selectedProfile === null
-                  ? 'Unset'
-                  : this.selectedProfile.name}</span
               >
+                ${this.selectedProfile === null
+                  ? 'Unset'
+                  : this.selectedProfile.name}
+              </button>
             </div>
 
             <div class="info-block" ?no-show=${this.curStep === Step.Author}>
               <span>Representative Papers:</span>
-              <span class="profile-name"
-                >${this.selectedPaperIDs.size} selected</span
+              <button
+                class="profile-name"
+                @click=${() => {
+                  this.jumpToStep(Step.Paper);
+                }}
               >
+                ${this.selectedPaperIDs.size} selected
+              </button>
             </div>
           </div>
 

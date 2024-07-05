@@ -102,6 +102,8 @@ export class RecRecAuthorList extends LitElement {
       this.authorStartIndex,
       this.authorStartIndex + AUTHORS_PER_PAGE
     )) {
+      if (author === null) continue;
+
       authors = html`${authors}
         <tr
           class="author-row"
@@ -113,8 +115,8 @@ export class RecRecAuthorList extends LitElement {
             <div class="svg-icon person-icon">${unsafeHTML(iconPerson)}</div>
           </td>
           <td class="name">
-            ${author.name}${author.affiliations.length > 0
-              ? ` (${author.affiliations[0]})`
+            ${author.name}${author.affiliations!.length > 0
+              ? ` (${author.affiliations![0]})`
               : ''}
           </td>
           <td class="paper-count">${author.paperCount} papers</td>

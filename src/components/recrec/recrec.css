@@ -18,6 +18,10 @@
     0 0 30px hsla(0, 0%, 0%, 0.04);
 }
 
+button {
+  all: unset;
+}
+
 .view-container {
   box-sizing: border-box;
   display: flex;
@@ -44,6 +48,11 @@
     border: 1px solid var(--gray-300);
     border-radius: 5px;
     padding: 5px 10px;
+    cursor: pointer;
+
+    &:hover {
+      border: 1px solid var(--gray-400);
+    }
 
     &[is-unset] {
       color: var(--gray-600);

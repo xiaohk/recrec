@@ -103,7 +103,8 @@ export const searchAuthorDetails = async (
   // Fetch the author details
   const response = await fetch(url, options);
   if (!response.ok) {
-    throw Error(
+    console.error('API error', response);
+    throw new Error(
       `Fetch error when getting author details, status: ${response.status}`
     );
   }
