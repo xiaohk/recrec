@@ -2,6 +2,7 @@ import { LitElement, css, unsafeCSS, html, PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { Step } from '../../types/common-types';
+import type { SemanticAuthorDetail } from '../../types/common-types';
 
 import iconCaret from '../../images/icon-caret-down.svg?raw';
 import componentCSS from './header-bar.css?inline';
@@ -24,6 +25,9 @@ export class RecRecHeaderBar extends LitElement {
   //==========================================================================||
   @property({ attribute: false })
   curStep = Step.Author;
+
+  @property({ attribute: false })
+  selectedProfile: SemanticAuthorDetail | null = null;
 
   get curStepIndex() {
     return steps.indexOf(this.curStep);
@@ -94,7 +98,8 @@ export class RecRecHeaderBar extends LitElement {
 
         <button
           class="svg-icon move-next"
-          ?disabled=${this.curStep === Step.Recommender}
+          ?disabled=${this.curStep === Step.Recommender ||
+          (this.curStep === Step.Author && this.selectedProfile === null)}
           @click=${() => {
             this.notifyParentMoveStep('next');
           }}

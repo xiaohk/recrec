@@ -740,7 +740,7 @@ export class RecRecRecommenderView extends LitElement {
         ></sl-progress-ring>
         <span class="progress-message">Fetching recommender details...</span>
         <span class="progress-remain-time"
-          >${formatRemainTime(this.remainTimeMS)} left</span
+          >About ${formatRemainTime(this.remainTimeMS)} left</span
         >
       </div>
     `;

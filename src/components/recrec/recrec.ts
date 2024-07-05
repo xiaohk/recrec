@@ -93,6 +93,10 @@ export class RecRecApp extends LitElement {
       const newCurStepIndex = Math.min(steps.length - 1, curStepIndex + 1);
       this.curStep = steps[newCurStepIndex];
     }
+
+    if (this.curStep === Step.Recommender) {
+      this.confirmedSelectedPaperIDs = this.selectedPaperIDs;
+    }
   }
 
   //==========================================================================||
@@ -161,6 +165,7 @@ export class RecRecApp extends LitElement {
         <div class="view-container">
           <recrec-header-bar
             .curStep=${this.curStep}
+            .selectedProfile=${this.selectedProfile}
             @step-clicked=${(e: CustomEvent<'pre' | 'next'>) => {
               this.headerStepClickedHandler(e);
             }}
