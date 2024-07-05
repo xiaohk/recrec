@@ -101,19 +101,16 @@ export const searchAuthorDetails = async (
   const url = `${baseURL}?${encodedParameters.toString()}`;
 
   // Fetch the author details
-  const response = await fetch(url, options);
-  if (!response.ok) {
-    console.error('API error', response);
-    throw new Error(
-      `Fetch error when getting author details, status: ${response.status}`
-    );
+  try {
+    const response = await fetch(url, options);
+    const data = (await response.json()) as SemanticAuthorDetail[];
+    return data;
+  } catch (e) {
+    console.error('API error', e);
+    throw new Error(`Fetch error when getting author details, status: ${e}`);
   }
 
-  const data = (await response.json()) as SemanticAuthorDetail[];
-
   // downloadJSON(data, null, 'author.json');
-
-  return data;
 };
 
 export const getAllPapersFromAuthor = async (authorID: string) => {

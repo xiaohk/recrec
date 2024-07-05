@@ -17,7 +17,6 @@ import {
 } from '@floating-ui/dom';
 import { format } from 'd3-format';
 import { config } from '../../config/config';
-
 import {
   AcademicAward,
   Step,
@@ -26,6 +25,7 @@ import {
   SemanticPaperCitationDetail,
   SemanticCitationAuthor
 } from '../../types/common-types';
+import type { NightjarSlider } from '../slider/slider';
 
 import '@shoelace-style/shoelace/dist/components/progress-ring/progress-ring';
 import '@shoelace-style/shoelace/dist/components/select/select';
@@ -224,6 +224,53 @@ export class RecRecRecommenderView extends LitElement {
       this.completedStep = 0;
       this.totalStep = 1;
       this.remainTimeMS = DEFAULT_REMAIN_TIME;
+
+      // Reset the sliders and checkboxes
+      this.citationTimeRange = {
+        min: 1,
+        max: 2,
+        curValue: 1,
+        initialValue: 1
+      };
+
+      this.hIndexRange = {
+        min: 1,
+        max: 2,
+        curValue: 1,
+        initialValue: 1
+      };
+
+      this.filterToggles = {
+        excludeCollaborator: false,
+        haveAward: false,
+        haveAffiliation: false
+      };
+
+      if (this.shadowRoot) {
+        const collaboratorCheckbox = this.shadowRoot.querySelector(
+          '#checkbox-collaboration'
+        ) as HTMLInputElement | null;
+
+        const awardCheckbox = this.shadowRoot.querySelector(
+          '#checkbox-award'
+        ) as HTMLInputElement | null;
+
+        const affiliationCheckbox = this.shadowRoot.querySelector(
+          '#checkbox-affiliation'
+        ) as HTMLInputElement | null;
+
+        if (collaboratorCheckbox) {
+          collaboratorCheckbox.checked = this.filterToggles.excludeCollaborator;
+        }
+
+        if (awardCheckbox) {
+          awardCheckbox.checked = this.filterToggles.haveAward;
+        }
+
+        if (affiliationCheckbox) {
+          affiliationCheckbox.checked = this.filterToggles.haveAffiliation;
+        }
+      }
     }
   }
 
@@ -793,6 +840,7 @@ export class RecRecRecommenderView extends LitElement {
                 Cited my works ≥ ${this.citationTimeRange.curValue} times
               </div>
               <nightjar-slider
+                id="slider-citation-time"
                 @valueChanged=${(e: CustomEvent<number>) =>
                   this.citeMeSliderChanged(e)}
                 min=${this.citationTimeRange.min}

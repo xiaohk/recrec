@@ -86,9 +86,23 @@ export class RecRecAuthorList extends LitElement {
       return;
     }
 
-    const data = await searchAuthorDetails(this.authors.map(d => d.authorId));
+    let done = false;
+    let retry = 3;
 
-    this.authorDetails = data;
+    while (!done && retry > 0) {
+      try {
+        const data = await searchAuthorDetails(
+          this.authors.map(d => d.authorId)
+        );
+        this.authorDetails = data;
+        done = true;
+      } catch (e) {
+        await new Promise<void>(resolve => {
+          setTimeout(resolve, 2000);
+        });
+        retry -= 1;
+      }
+    }
   }
 
   //==========================================================================||

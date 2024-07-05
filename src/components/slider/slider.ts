@@ -84,7 +84,7 @@ export class NightjarSlider extends LitElement {
         const trackBBox = track.getBoundingClientRect();
 
         // Update the thumb and the range track
-        const progress = this.curValue / (this.max - this.min);
+        const progress = (this.curValue - this.min) / (this.max - this.min);
         const xPos = progress * trackBBox.width - thumbBBox.width / 2;
         thumb.style.left = `${xPos}px`;
         rangeTrack.style.width = `${Math.max(0, xPos)}px`;
