@@ -1,6 +1,6 @@
 .header-bar {
   width: 100%;
-  padding: 10px 20px;
+  padding: 10px var(--container-h-padding);
 
   display: flex;
   flex-direction: row;
@@ -58,11 +58,13 @@ button {
   align-items: center;
   font-weight: 600;
   font-size: var(--font-u2);
+  text-align: center;
   gap: 10px;
   cursor: default;
 
   .step-info {
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 
     border-radius: 5px;
     padding: 0px 8px;
@@ -74,4 +76,10 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+@media only screen and (max-width: 768px) {
+  .title-middle {
+    padding: 0 20px;
+  }
 }

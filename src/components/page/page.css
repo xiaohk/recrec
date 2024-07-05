@@ -29,7 +29,7 @@
   cursor: default;
 
   .tag-line {
-    font-size: 24px;
+    font-size: var(--font-u7);
     padding-top: 20px;
     color: var(--blue-900);
     margin-left: -20px;
@@ -39,16 +39,17 @@
   .head-group {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: var(--font-u7);
   }
 
   a.button {
-    padding-top: 20px;
-    font-size: 20px;
+    padding-top: var(--font-d2);
+    font-size: var(--font-u6);
     text-decoration: none;
     color: initial;
     font-weight: 500;
     color: var(--gray-600);
+    white-space: nowrap;
 
     &:hover {
       color: var(--blue-800);
@@ -66,7 +67,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 25px;
+    padding-top: var(--font-u7);
     box-sizing: border-box;
   }
 }
@@ -75,7 +76,7 @@
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  width: 140px;
+  flex: 0 1 140px;
 
   color: currentColor;
   transition: transform 80ms linear;
@@ -85,5 +86,23 @@
     fill: currentColor;
     width: 100%;
     height: 100%;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .tag-line {
+    display: none;
+  }
+
+  .headline {
+    padding: 5px 20px 0 20px;
+
+    a.button {
+      font-size: var(--font-u5);
+    }
+  }
+
+  .svg-icon {
+    flex: 0 1 110px;
   }
 }
