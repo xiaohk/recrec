@@ -79,3 +79,12 @@ button {
     }
   }
 }
+
+@media only screen and (max-width: 768px) {
+  .app {
+    width: calc(100% - 0px);
+    height: calc(100% - 0px);
+    box-shadow: none;
+    border-radius: 0px;
+  }
+}

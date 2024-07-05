@@ -16,6 +16,7 @@
   width: 100%;
   border-collapse: collapse;
   white-space: nowrap;
+  --cell-padding-right: 50px;
 
   &:has(.author-row) {
     margin-top: 10px;
@@ -77,21 +78,24 @@
   }
 
   .name {
-    padding-right: 50px;
+    padding-right: var(--cell-padding-right);
     font-weight: 600;
     max-width: 500px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    vertical-align: top;
   }
 
   .paper-count {
     color: var(--gray-500);
-    padding-right: 50px;
+    padding-right: var(--cell-padding-right);
+    vertical-align: top;
   }
 
   .citation-count {
     color: var(--gray-500);
+    vertical-align: top;
   }
 }
 
@@ -110,5 +114,16 @@
     fill: currentColor;
     width: 100%;
     height: 100%;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .author-table {
+    --cell-padding-right: 10px;
+
+    .name {
+      min-width: 100px;
+      white-space: wrap;
+    }
   }
 }

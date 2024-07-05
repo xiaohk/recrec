@@ -135,7 +135,7 @@ export class RecRecAuthorList extends LitElement {
           </td>
           <td class="paper-count">${author.paperCount} papers</td>
           <td class="citation-count">${author.citationCount} citations</td>
-          <td></td>
+          <td class="extra-cell"></td>
         </tr> `;
     }
 
