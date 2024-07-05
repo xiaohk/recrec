@@ -80,11 +80,32 @@ button {
   }
 }
 
+@media only screen and (min-width: 768px) {
+  .small-window {
+    display: none;
+  }
+}
+
 @media only screen and (max-width: 768px) {
   .app {
     width: calc(100% - 0px);
     height: calc(100% - 0px);
     box-shadow: none;
     border-radius: 0px;
+  }
+
+  .full-window {
+    display: none;
+  }
+
+  .info-bar {
+    gap: 10px;
+  }
+
+  .profile-name {
+    max-width: 130px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
 }

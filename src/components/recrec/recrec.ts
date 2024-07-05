@@ -173,7 +173,8 @@ export class RecRecApp extends LitElement {
 
           <div class="info-bar">
             <div class="info-block">
-              <span>My Profile:</span>
+              <span class="full-window">My Profile:</span>
+              <span class="small-window">I'm:</span>
               <button
                 class="profile-name"
                 @click=${() => {
@@ -188,7 +189,8 @@ export class RecRecApp extends LitElement {
             </div>
 
             <div class="info-block" ?no-show=${this.curStep === Step.Author}>
-              <span>Representative Papers:</span>
+              <span class="full-window">Representative Papers:</span>
+              <span class="small-window">Papers:</span>
               <button
                 class="profile-name"
                 @click=${() => {
