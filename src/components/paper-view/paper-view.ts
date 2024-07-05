@@ -71,7 +71,25 @@ export class RecRecPaperView extends LitElement {
     }
 
     this.isCompleted = false;
-    const papers = await getAllPapersFromAuthor(this.selectedProfile.authorId);
+
+    let done = false;
+    let retry = 3;
+
+    let papers: SemanticPaper[] = [];
+
+    while (!done && retry > 0) {
+      try {
+        papers = await getAllPapersFromAuthor(this.selectedProfile.authorId);
+        done = true;
+      } catch (e) {
+        await new Promise<void>(resolve => {
+          setTimeout(() => {
+            resolve();
+          }, 1500);
+        });
+        retry -= 1;
+      }
+    }
 
     // Sort the papers by publication date first
     // papers.sort((a, b) => comparePaperDate(b, a));
