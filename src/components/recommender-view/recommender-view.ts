@@ -359,7 +359,19 @@ export class RecRecRecommenderView extends LitElement {
       console.log(`Chunk: ${i}`);
       const startTime = performance.now();
 
-      const curResult = await searchAuthorDetails(chunk, field);
+      let retry = 3;
+      let done = false;
+      let curResult: SemanticAuthorDetail[] = [];
+
+      while (!done && retry > 0) {
+        try {
+          curResult = await searchAuthorDetails(chunk, field);
+          done = true;
+        } catch (e) {
+          console.error('searchAuthorDetails', e);
+          retry -= 1;
+        }
+      }
 
       // Update the paper count and citation count for the authors in this batch
       for (const author of curResult) {
@@ -726,7 +738,7 @@ export class RecRecRecommenderView extends LitElement {
         <sl-progress-ring
           value=${(this.completedStep / this.totalStep) * 100}
         ></sl-progress-ring>
-        <span class="progress-message">Fetching author details...</span>
+        <span class="progress-message">Fetching recommender details...</span>
         <span class="progress-remain-time"
           >${formatRemainTime(this.remainTimeMS)} left</span
         >
@@ -931,9 +943,9 @@ export const updatePopperOverlay = (
         arrowElement.style[staticSide] = '-4px';
 
         if (middlewareData.hide?.referenceHidden) {
-          tooltip.classList.add('hidden');
+          tooltip.classList.add('no-show');
         } else {
-          tooltip.classList.remove('hidden');
+          tooltip.classList.remove('no-show');
         }
       })
       .catch(() => {});
@@ -967,10 +979,10 @@ const formatRemainTime = (milliseconds: number): string => {
 
   let result = '';
   if (hours > 0) {
-    result += `${hours} hour${hours !== 1 ? 's' : ''}, `;
+    result += `${hours} hour${hours !== 1 ? 's' : ''} `;
   }
   if (minutes > 0) {
-    result += `${minutes} minute${minutes !== 1 ? 's' : ''}, `;
+    result += `${minutes} minute${minutes !== 1 ? 's' : ''} `;
   }
   if (seconds > 0) {
     result += `${seconds} second${seconds !== 1 ? 's' : ''} `;
