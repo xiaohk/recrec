@@ -223,7 +223,7 @@ export class RecRecApp extends LitElement {
                   this.jumpToStep(Step.Paper);
                 }}
               >
-                ${this.selectedPaperIDs.size} selected
+                ${this.selectedPaperIDs.size} ${MOBILE_MODE ? '' : 'selected'}
               </button>
             </div>
           </div>

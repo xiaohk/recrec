@@ -122,11 +122,9 @@ button {
 
 .hamburger-icon {
   --hamburger-width: 16px;
-  --hamburger-height: 12px;
+  --hamburger-height: calc(sin(45deg) * var(--hamburger-width));
   --hamburger-line-height: 2px;
-  --hamburger-gap-height: calc(
-    (var(--hamburger-height) - (var(--hamburger-line-height) * 3)) / 2
-  );
+
   width: var(--hamburger-width);
   height: var(--hamburger-height);
 
@@ -140,7 +138,7 @@ button {
   border-radius: var(--hamburger-line-height);
   width: 100%;
 
-  background: var(--gray-700);
+  background: currentColor;
   opacity: 1;
   left: 0;
 
@@ -173,11 +171,8 @@ button {
 }
 
 .hamburger-icon[open] span:nth-child(3) {
-  transform-origin: left center;
   transform: rotate(-45deg);
-  top: calc(
-    (0.8509035245 * var(--hamburger-width)) - (var(--hamburger-line-height) / 1)
-  );
+  top: var(--hamburger-height);
   left: calc((var(--hamburger-width) - var(--hamburger-height)) / 2);
 }
 
@@ -193,8 +188,8 @@ button {
     gap: 10px;
   }
 
-  .profile-name {
-    max-width: 130px;
+  .info-button {
+    max-width: 140px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
