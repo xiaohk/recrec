@@ -96,7 +96,7 @@ export class NightjarSlider extends LitElement {
   /**
    * Event handler for the thumb mousedown
    */
-  thumbMouseDownHandler(e: MouseEvent) {
+  thumbMouseDownHandler(e: MouseEvent | TouchEvent) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -117,14 +117,21 @@ export class NightjarSlider extends LitElement {
     // as active
     thumb.focus();
 
-    const mouseMoveHandler = (e: MouseEvent) => {
+    const mouseMoveHandler = (e: MouseEvent | TouchEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
       // Block the mouse event outside the slider
       // eventBlocker.classList.add('activated');
 
-      const deltaX = e.pageX - trackBBox.x;
+      let pageX = 0;
+      if ((e as MouseEvent).pageX) {
+        pageX = (e as MouseEvent).pageX;
+      } else {
+        pageX = (e as TouchEvent).touches[0].pageX;
+      }
+
+      const deltaX = pageX - trackBBox.x;
       const progress = Math.min(1, Math.max(0, deltaX / trackWidth));
 
       // Move the thumb
@@ -149,14 +156,23 @@ export class NightjarSlider extends LitElement {
     const mouseUpHandler = () => {
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseup', mouseUpHandler);
+
+      // Also handle touch screen
+      document.removeEventListener('touchmove', mouseMoveHandler);
+      document.removeEventListener('touchend', mouseUpHandler);
+
       // eventBlocker.classList.remove('activated');
       thumb.blur();
     };
 
     // Listen to mouse move on the whole page (users can drag outside of the
-    // thumb, track, or even WizMap!)
+    // thumb, track, or even the tool!)
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
+
+    // Also handle touch screen
+    document.addEventListener('touchmove', mouseMoveHandler);
+    document.addEventListener('touchend', mouseUpHandler);
   }
 
   // ===== Templates and Styles ======
@@ -182,6 +198,7 @@ export class NightjarSlider extends LitElement {
           id="slider-middle-thumb"
           tabindex="-1"
           @mousedown=${(e: MouseEvent) => this.thumbMouseDownHandler(e)}
+          @touchstart=${(e: TouchEvent) => this.thumbMouseDownHandler(e)}
         >
           <div class="thumb-label thumb-label-middle">
             <span class="thumb-label-span"></span>
