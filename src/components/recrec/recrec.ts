@@ -14,6 +14,7 @@ import '../recommender-view/recommender-view';
 
 import componentCSS from './recrec.css?inline';
 
+const MOBILE_MODE = window.screen.width < 768;
 const steps = [Step.Author, Step.Paper, Step.Recommender];
 
 /**
@@ -173,8 +174,7 @@ export class RecRecApp extends LitElement {
 
           <div class="info-bar">
             <div class="info-block">
-              <span class="full-window">My Profile:</span>
-              <span class="small-window">I'm:</span>
+              <span>${MOBILE_MODE ? "I'm" : 'My Profile:'}</span>
               <button
                 class="profile-name"
                 @click=${() => {
@@ -189,8 +189,7 @@ export class RecRecApp extends LitElement {
             </div>
 
             <div class="info-block" ?no-show=${this.curStep === Step.Author}>
-              <span class="full-window">Representative Papers:</span>
-              <span class="small-window">Papers:</span>
+              <span>${MOBILE_MODE ? 'Papers:' : 'Representative Papers:'}</span>
               <button
                 class="profile-name"
                 @click=${() => {

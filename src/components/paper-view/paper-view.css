@@ -248,3 +248,26 @@ button {
     transform: rotate(1turn);
   }
 }
+
+@media only screen and (max-width: 768px) {
+  .paper-table {
+    table-layout: fixed;
+    --table-h-padding: 0px;
+
+    .col-checkbox {
+      width: 36px;
+    }
+
+    .col-citation {
+      width: 42px;
+    }
+
+    .col-date {
+      width: 64px;
+    }
+
+    .title-cell {
+      padding: var(--table-v-padding) 12px 0 12px;
+    }
+  }
+}

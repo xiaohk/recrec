@@ -10,6 +10,8 @@ import { getAllPapersFromAuthor } from '../../api/semantic-scholar';
 
 import componentCSS from './paper-view.css?inline';
 
+const MOBILE_MODE = window.screen.width < 768;
+
 /**
  * Paper view element.
  */
@@ -275,6 +277,13 @@ export class RecRecPaperView extends LitElement {
 
         <div class="table-container">
           <table class="paper-table">
+            <colgroup>
+              <col class="col-checkbox" />
+              <col class="col-title" />
+              <col class="col-citation" />
+              <col class="col-date" />
+            </colgroup>
+
             <thead>
               <tr class="header-row">
                 <th class="selected-cell header-cell">
@@ -301,7 +310,9 @@ export class RecRecPaperView extends LitElement {
                   class="citation-cell header-cell"
                   @click=${() => this.headerButtonClicked('citedBy')}
                 >
-                  <button class="header-button">Cited By</button>
+                  <button class="header-button">
+                    ${MOBILE_MODE ? 'Cited' : 'Cited By'}
+                  </button>
                 </th>
                 <th
                   class="date-cell header-cell"
