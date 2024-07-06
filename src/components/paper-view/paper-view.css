@@ -267,7 +267,7 @@ button {
     }
 
     .title-cell {
-      padding: var(--table-v-padding) 12px 0 12px;
+      padding: var(--table-v-padding) 0px 0 12px;
     }
   }
 }

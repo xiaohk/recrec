@@ -40,6 +40,7 @@ import iconCiteTimes from '../../images/icon-cite-times-c.svg?raw';
 const DEV_MODE = true;
 const MAX_RECOMMENDER_NUM = 500;
 const DEFAULT_REMAIN_TIME = 30000;
+const MOBILE_MODE = window.screen.width < 768;
 const SLIDER_STYLE = {
   foregroundColor: config.colors['blue-700'],
   backgroundColor: config.colors['blue-100'],
@@ -89,6 +90,9 @@ export class RecRecRecommenderView extends LitElement {
   //==========================================================================||
   @property({ attribute: false })
   curStep: Step = Step.Author;
+
+  @property({ attribute: false })
+  showPopMenu = false;
 
   @property({ attribute: false })
   selectedProfile: SemanticAuthorDetail | null = null;
@@ -802,99 +806,108 @@ export class RecRecRecommenderView extends LitElement {
         </tr> `;
     }
 
-    return html`
-      <div class="recommender-view">
-        ${progressRing}
-
-        <div class="control-bar">
-          <div class="control-section">
-            <div class="control-block title-block">
-              <span class="title"
-                >${this.numberFormatter(this.curRecommendersSize)}
-                Recommenders</span
-              >
-            </div>
-
-            <div class="control-block select-block">
-              <span>Sorted by</span>
-
-              <div class="select-wrapper">
-                <select
-                  class="select-sort"
-                  @change=${(e: InputEvent) => {
-                    this.selectChanged(e);
-                  }}
-                >
-                  <option value="citeTimes">Citing my works</option>
-                  <option value="hIndex">H-Index</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="separator"></div>
-
-          <div class="control-section control-section-slider">
-            <div class="control-block slider-block">
-              <div class="citation-slider-label">
-                Cited my works ≥ ${this.citationTimeRange.curValue} times
-              </div>
-              <nightjar-slider
-                id="slider-citation-time"
-                @valueChanged=${(e: CustomEvent<number>) =>
-                  this.citeMeSliderChanged(e)}
-                min=${this.citationTimeRange.min}
-                max=${this.citationTimeRange.max}
-                curValue=${this.citationTimeRange.initialValue}
-                .styleConfig=${SLIDER_STYLE}
-              ></nightjar-slider>
-            </div>
-
-            <div class="control-block slider-block">
-              <div class="citation-slider-label">
-                H-Index ≥ ${this.hIndexRange.curValue}
-              </div>
-              <nightjar-slider
-                @valueChanged=${(e: CustomEvent<number>) =>
-                  this.hIndexSliderChanged(e)}
-                min=${this.hIndexRange.min}
-                max=${this.hIndexRange.max}
-                curValue=${this.hIndexRange.initialValue}
-                .styleConfig=${SLIDER_STYLE}
-              ></nightjar-slider>
-            </div>
-          </div>
-
-          <div class="separator"></div>
-
-          <div
-            class="control-section "
-            @input=${(e: InputEvent) => this.checkboxInput(e)}
+    // Compile the control sidebar
+    const controlBarContent = html`
+      <div class="control-section">
+        <div class="control-block title-block">
+          <span class="title"
+            >${this.numberFormatter(this.curRecommendersSize)}
+            Recommenders</span
           >
-            <div class="control-block checkbox-block">
-              <div class="checkbox-wrapper">
-                <input type="checkbox" id="checkbox-collaboration" />
-                <label for="checkbox-collaboration"
-                  >Exclude collaborators</label
-                >
-              </div>
-            </div>
+        </div>
 
-            <div class="control-block checkbox-block">
-              <div class="checkbox-wrapper">
-                <input type="checkbox" id="checkbox-award" />
-                <label for="checkbox-award">Have awards</label>
-              </div>
-            </div>
+        <div class="control-block select-block">
+          <span>Sorted by</span>
 
-            <div class="control-block checkbox-block">
-              <div class="checkbox-wrapper">
-                <input type="checkbox" id="checkbox-affiliation" />
-                <label for="checkbox-affiliation">Have affiliation</label>
-              </div>
-            </div>
+          <div class="select-wrapper">
+            <select
+              class="select-sort"
+              @change=${(e: InputEvent) => {
+                this.selectChanged(e);
+              }}
+            >
+              <option value="citeTimes">Citing my works</option>
+              <option value="hIndex">H-Index</option>
+            </select>
           </div>
         </div>
+      </div>
+
+      <div class="separator"></div>
+
+      <div class="control-section control-section-slider">
+        <div class="control-block slider-block">
+          <div class="citation-slider-label">
+            Cited my works ≥ ${this.citationTimeRange.curValue} times
+          </div>
+          <nightjar-slider
+            id="slider-citation-time"
+            @valueChanged=${(e: CustomEvent<number>) =>
+              this.citeMeSliderChanged(e)}
+            min=${this.citationTimeRange.min}
+            max=${this.citationTimeRange.max}
+            curValue=${this.citationTimeRange.initialValue}
+            .styleConfig=${SLIDER_STYLE}
+          ></nightjar-slider>
+        </div>
+
+        <div class="control-block slider-block">
+          <div class="citation-slider-label">
+            H-Index ≥ ${this.hIndexRange.curValue}
+          </div>
+          <nightjar-slider
+            @valueChanged=${(e: CustomEvent<number>) =>
+              this.hIndexSliderChanged(e)}
+            min=${this.hIndexRange.min}
+            max=${this.hIndexRange.max}
+            curValue=${this.hIndexRange.initialValue}
+            .styleConfig=${SLIDER_STYLE}
+          ></nightjar-slider>
+        </div>
+      </div>
+
+      <div class="separator"></div>
+
+      <div
+        class="control-section "
+        @input=${(e: InputEvent) => this.checkboxInput(e)}
+      >
+        <div class="control-block checkbox-block">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="checkbox-collaboration" />
+            <label for="checkbox-collaboration">Exclude collaborators</label>
+          </div>
+        </div>
+
+        <div class="control-block checkbox-block">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="checkbox-award" />
+            <label for="checkbox-award">Have awards</label>
+          </div>
+        </div>
+
+        <div class="control-block checkbox-block">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="checkbox-affiliation" />
+            <label for="checkbox-affiliation">Have affiliation</label>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const controlSideBar = html`
+      <div class="control-bar">${controlBarContent}</div>
+    `;
+
+    const controlPopBar = html`
+      <div class="control-pop-bar" ?no-show=${!this.showPopMenu}>
+        ${controlBarContent}
+      </div>
+    `;
+
+    return html`
+      <div class="recommender-view">
+        ${progressRing} ${MOBILE_MODE ? controlPopBar : controlSideBar}
 
         <div class="right-content">
           ${recommenderEmptyView}

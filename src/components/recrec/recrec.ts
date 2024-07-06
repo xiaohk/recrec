@@ -13,6 +13,7 @@ import '../paper-view/paper-view';
 import '../recommender-view/recommender-view';
 
 import componentCSS from './recrec.css?inline';
+import iconBars from '../../images/icon-bars.svg?raw';
 
 const MOBILE_MODE = window.screen.width < 768;
 const steps = [Step.Author, Step.Paper, Step.Recommender];
@@ -44,19 +45,22 @@ export class RecRecApp extends LitElement {
   @state()
   confirmedSelectedPaperIDs = new Set<string>();
 
+  @state()
+  showPopMenu = false;
+
   //==========================================================================||
   //                             Lifecycle Methods                            ||
   //==========================================================================||
   constructor() {
     super();
-    // this.selectedProfile = {
-    //   authorId: '1390877819',
-    //   name: 'Zijie J. Wang',
-    //   affiliations: ['Georgia Tech'],
-    //   homepage: 'https://zijie.wang',
-    //   paperCount: 42,
-    //   citationCount: 1716
-    // };
+    this.selectedProfile = {
+      authorId: '1390877819',
+      name: 'Zijie J. Wang',
+      affiliations: ['Georgia Tech'],
+      homepage: 'https://zijie.wang',
+      paperCount: 42,
+      citationCount: 1716
+    };
   }
 
   /**
@@ -154,11 +158,30 @@ export class RecRecApp extends LitElement {
       <recrec-recommender-view
         class="content-view"
         ?no-show=${this.curStep !== Step.Recommender}
+        .showPopMenu=${this.showPopMenu}
         .curStep=${this.curStep}
         .papers=${this.papers}
         .selectedPaperIDs=${this.confirmedSelectedPaperIDs}
         .selectedProfile=${this.selectedProfile}
       ></recrec-recommender-view>
+    `;
+
+    // Compile a menu icon for the mobile version
+    const menuButton = html`
+      <div class="info-block">
+        <button
+          class="menu-button"
+          @click=${() => {
+            this.showPopMenu = !this.showPopMenu;
+          }}
+        >
+          <div class="hamburger-icon" ?open=${this.showPopMenu}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </button>
+      </div>
     `;
 
     return html`
@@ -173,10 +196,14 @@ export class RecRecApp extends LitElement {
           ></recrec-header-bar>
 
           <div class="info-bar">
+            ${MOBILE_MODE && this.curStep === Step.Recommender
+              ? menuButton
+              : html``}
+
             <div class="info-block">
               <span>${MOBILE_MODE ? "I'm" : 'My Profile:'}</span>
               <button
-                class="profile-name"
+                class="info-button"
                 @click=${() => {
                   this.jumpToStep(Step.Author);
                 }}
@@ -189,9 +216,9 @@ export class RecRecApp extends LitElement {
             </div>
 
             <div class="info-block" ?no-show=${this.curStep === Step.Author}>
-              <span>${MOBILE_MODE ? 'Papers:' : 'Representative Papers:'}</span>
+              <span>${MOBILE_MODE ? 'Papers' : 'Representative Papers:'}</span>
               <button
-                class="profile-name"
+                class="info-button"
                 @click=${() => {
                   this.jumpToStep(Step.Paper);
                 }}

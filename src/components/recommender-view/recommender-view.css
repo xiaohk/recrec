@@ -9,6 +9,7 @@
 
   box-sizing: border-box;
   position: relative;
+  overflow: hidden;
 }
 
 .svg-icon {
@@ -40,6 +41,33 @@
 
   --sl-color-primary-600: var(--blue-700);
   --sl-font-size-medium: 1rem;
+}
+
+.control-pop-bar {
+  position: absolute;
+  z-index: 1;
+  background: white;
+
+  display: flex;
+  flex-flow: column;
+  height: min-content;
+  gap: 10px;
+
+  --sl-color-primary-600: var(--blue-700);
+  --sl-font-size-medium: 1rem;
+
+  padding-bottom: 20px;
+  border-right: 1px solid var(--gray-300);
+  border-bottom: 1px solid var(--gray-300);
+  border-bottom-right-radius: 5px;
+  box-shadow:
+    0px 0px 5px hsla(0, 0%, 0%, 0.06),
+    0px 0px 10px hsla(0, 0%, 0%, 0.06),
+    0px 0px 20px hsla(0, 0%, 0%, 0.06);
+
+  &[no-show] {
+    display: none;
+  }
 }
 
 .control-section {

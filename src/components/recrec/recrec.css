@@ -37,17 +37,22 @@ button {
   align-items: center;
   gap: 20px;
   border-bottom: 1px solid var(--gray-300);
+  box-sizing: border-box;
 
   .info-block {
+    height: 100%;
+    box-sizing: border-box;
+
     &[no-show] {
       display: none;
     }
   }
 
-  .profile-name {
+  .info-button {
     border: 1px solid var(--gray-300);
     border-radius: 5px;
     padding: 5px 10px;
+    box-sizing: border-box;
     cursor: pointer;
 
     &:hover {
@@ -56,6 +61,23 @@ button {
 
     &[is-unset] {
       color: var(--gray-600);
+    }
+  }
+
+  .menu-button {
+    border: 1px solid var(--gray-300);
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    height: 100%;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      border: 1px solid var(--gray-400);
     }
   }
 }
@@ -78,6 +100,85 @@ button {
       display: none;
     }
   }
+}
+
+.svg-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 1em;
+  height: 1em;
+
+  color: currentColor;
+  transition: transform 80ms linear;
+  transform-origin: center;
+
+  & svg {
+    fill: currentColor;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.hamburger-icon {
+  --hamburger-width: 16px;
+  --hamburger-height: 12px;
+  --hamburger-line-height: 2px;
+  --hamburger-gap-height: calc(
+    (var(--hamburger-height) - (var(--hamburger-line-height) * 3)) / 2
+  );
+  width: var(--hamburger-width);
+  height: var(--hamburger-height);
+
+  transform: rotate(0deg);
+  transition: 300ms ease-in-out;
+}
+
+.hamburger-icon span {
+  position: absolute;
+  height: var(--hamburger-line-height);
+  border-radius: var(--hamburger-line-height);
+  width: 100%;
+
+  background: var(--gray-700);
+  opacity: 1;
+  left: 0;
+
+  transform: rotate(0deg);
+  transform-origin: left center;
+  transition: 150ms ease-in-out;
+}
+
+.hamburger-icon span:nth-child(1) {
+  top: 0px;
+}
+
+.hamburger-icon span:nth-child(2) {
+  top: calc((var(--hamburger-height) / 2) - (var(--hamburger-line-height) / 2));
+}
+
+.hamburger-icon span:nth-child(3) {
+  top: calc(var(--hamburger-height) - var(--hamburger-line-height) / 1);
+}
+
+.hamburger-icon[open] span:nth-child(1) {
+  transform: rotate(45deg);
+  top: 0px;
+  left: calc((var(--hamburger-width) - var(--hamburger-height)) / 2);
+}
+
+.hamburger-icon[open] span:nth-child(2) {
+  width: 0%;
+  opacity: 0;
+}
+
+.hamburger-icon[open] span:nth-child(3) {
+  transform-origin: left center;
+  transform: rotate(-45deg);
+  top: calc(
+    (0.8509035245 * var(--hamburger-width)) - (var(--hamburger-line-height) / 1)
+  );
+  left: calc((var(--hamburger-width) - var(--hamburger-height)) / 2);
 }
 
 @media only screen and (max-width: 768px) {

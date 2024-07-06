@@ -105,4 +105,10 @@
   .svg-icon {
     flex: 0 1 110px;
   }
+
+  .app-container {
+    recrec-app {
+      padding-top: 10px;
+    }
+  }
 }
