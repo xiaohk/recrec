@@ -13,7 +13,8 @@ import {
   flip,
   shift,
   arrow,
-  hide
+  hide,
+  size
 } from '@floating-ui/dom';
 import { format } from 'd3-format';
 import { config } from '../../config/config';
@@ -618,6 +619,9 @@ export class RecRecRecommenderView extends LitElement {
   }
 
   async citeTimeButtonClicked(e: MouseEvent, recommender: Recommender) {
+    e.stopPropagation();
+    e.preventDefault();
+
     if (!this.paperOverlayElement) {
       console.error('paperOverlayElement are not initialized yet.');
       return;
@@ -639,7 +643,14 @@ export class RecRecRecommenderView extends LitElement {
     await this.updateComplete;
 
     const updateOverlay = () => {
-      updatePopperOverlay(this.paperOverlayElement!, anchor, 'left', true, 10);
+      updatePopperOverlay(
+        this.paperOverlayElement!,
+        anchor,
+        'left',
+        true,
+        10,
+        300
+      );
     };
 
     this.overlayCleanup = autoUpdate(
@@ -746,6 +757,9 @@ export class RecRecRecommenderView extends LitElement {
               tabindex="0"
               @click=${(e: MouseEvent) =>
                 this.citeTimeButtonClicked(e, recommender)}
+              @touchstart=${(e: TouchEvent) => {
+                e.stopPropagation();
+              }}
               @blur=${() => this.citeTimeBlurred()}
             >
               <span class="svg-icon">${unsafeHTML(iconCiteTimes)}</span>
@@ -800,10 +814,8 @@ export class RecRecRecommenderView extends LitElement {
     let paperOverlayContent = html``;
     for (const [paper, count] of this.overlayPaperCounts) {
       paperOverlayContent = html`${paperOverlayContent}
-        <tr>
-          <td class="td-paper">${paper}</td>
-          <td class="td-count">${count}x</td>
-        </tr> `;
+        <div class="cell-paper">${paper}</div>
+        <div class="cell-count">${count}x</div> `;
     }
 
     // Compile the control sidebar
@@ -909,7 +921,12 @@ export class RecRecRecommenderView extends LitElement {
       <div class="recommender-view">
         ${progressRing} ${MOBILE_MODE ? controlPopBar : controlSideBar}
 
-        <div class="right-content">
+        <div
+          class="right-content"
+          @touchstart=${() => {
+            this.citeTimeBlurred();
+          }}
+        >
           ${recommenderEmptyView}
           <div class="recommender-content">${recommenderCards}</div>
 
@@ -929,17 +946,8 @@ export class RecRecRecommenderView extends LitElement {
           </div>
         </div>
 
-        <div id="popper-tooltip" class="popper-tooltip hidden" role="tooltip">
-          <span class="popper-content"></span>
-          <div class="popper-arrow"></div>
-        </div>
-
         <div id="paper-overlay" class="popper-tooltip hidden" role="tooltip">
-          <table class="popper-content">
-            <tbody>
-              ${paperOverlayContent}
-            </tbody>
-          </table>
+          <div class="popper-content">${paperOverlayContent}</div>
           <div class="popper-arrow"></div>
         </div>
       </div>
@@ -960,17 +968,22 @@ declare global {
 }
 
 /**
- * Update the popper tooltip for the highlighted prompt point
- * @param tooltip Tooltip element
- * @param anchor Anchor point for the tooltip
- * @param point The prompt point
+ * Updates the position and appearance of a popper overlay tooltip.
+ * @param tooltip - The tooltip element.
+ * @param anchor - The anchor element to which the tooltip is attached.
+ * @param placement - The placement of the tooltip relative to the anchor
+ *  ('bottom', 'left', 'top', 'right').
+ * @param withArrow - Indicates whether the tooltip should have an arrow.
+ * @param offsetAmount - The offset amount in pixels.
+ * @param maxWidth - The maximum width of the tooltip in pixels (optional).
  */
 export const updatePopperOverlay = (
   tooltip: HTMLElement,
   anchor: HTMLElement,
   placement: 'bottom' | 'left' | 'top' | 'right',
   withArrow: boolean,
-  offsetAmount = 8
+  offsetAmount = 8,
+  maxWidth?: number
 ) => {
   const arrowElement = tooltip.querySelector('.popper-arrow')! as HTMLElement;
 
@@ -981,6 +994,15 @@ export const updatePopperOverlay = (
       middleware: [
         offset(offsetAmount),
         flip(),
+        size({
+          apply({ availableWidth, elements }) {
+            if (maxWidth) {
+              Object.assign(elements.floating.style, {
+                maxWidth: `${Math.min(maxWidth, availableWidth)}px`
+              });
+            }
+          }
+        }),
         shift(),
         arrow({ element: arrowElement }),
         hide()
@@ -996,6 +1018,8 @@ export const updatePopperOverlay = (
         if (placement.includes('right')) staticSide = 'left';
         if (placement.includes('bottom')) staticSide = 'top';
         if (placement.includes('left')) staticSide = 'right';
+
+        tooltip.setAttribute('placement', placement);
 
         arrowElement.style.left = arrowX ? `${arrowX}px` : '';
         arrowElement.style.top = arrowY ? `${arrowY}px` : '';

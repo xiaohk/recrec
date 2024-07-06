@@ -436,6 +436,10 @@ button {
     opacity 150ms linear,
     transform 150ms linear;
 
+  &[placement='right'] {
+    transform-origin: left center;
+  }
+
   &.hidden {
     opacity: 0;
     pointer-events: none;
@@ -452,7 +456,13 @@ button {
     line-height: 1.5;
     overflow-x: hidden;
     overflow-y: auto;
-    display: flex;
+
+    display: grid;
+    grid-template-columns: auto min-content;
+    column-gap: 3px;
+    row-gap: 2px;
+    padding: 2px;
+
     user-select: none;
     -webkit-user-select: none;
   }
@@ -469,17 +479,35 @@ button {
       opacity: 0;
     }
   }
+
+  .cell-paper {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cell-count {
+    text-align: right;
+  }
 }
 
-.td-paper {
-  text-align: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 200px;
-}
+@media only screen and (max-width: 768px) {
+  .popper-tooltip {
+    .popper-content {
+      max-width: 100%;
+      table-layout: fixed;
+    }
 
-.td-count {
-  text-align: right;
-  padding-left: 3px;
+    .td-paper {
+      max-width: unset;
+    }
+
+    .col-paper {
+      width: auto;
+    }
+
+    .col-count {
+      width: 20px;
+    }
+  }
 }
