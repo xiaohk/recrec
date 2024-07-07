@@ -1,7 +1,7 @@
 {
-  "name": "jay",
-  "private": true,
-  "version": "0.0.0",
+  "name": "recrec",
+  "private": false,
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite --port 3000",
