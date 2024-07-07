@@ -283,7 +283,9 @@ export class RecRecRecommenderView extends LitElement {
   //                              Custom Methods                              ||
   //==========================================================================||
   async initData() {
-    const response = await fetch('/data/award-recipients.json');
+    const response = await fetch(
+      `${import.meta.env.BASE_URL}data/award-recipients.json`
+    );
     const awardData = (await response.json()) as Record<
       string,
       AcademicAward[]
