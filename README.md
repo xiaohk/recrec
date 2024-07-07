@@ -1,7 +1,7 @@
 <h1>RecRec <a href="https://poloclub.github.io/recrec/"><picture>
 
-  <source media="(prefers-color-scheme: dark)" srcset="public/android-chrome-192x192.png">
-  <img align="right" alt="RecRec logo." src="public/android-chrome-192x192.png" width="30" height="30">
+  <source media="(prefers-color-scheme: dark)" srcset="https://i.imgur.com/h9q1Vg6.png">
+  <img align="right" alt="RecRec logo." src="https://i.imgur.com/h9q1Vg6.png" height="50">
 </picture></a></h1>
 
 [![Github Actions Status](https://github.com/xiaohk/recrec/workflows/build/badge.svg)](https://github.com/xiaohk/recrec/actions/workflows/build.yml)
