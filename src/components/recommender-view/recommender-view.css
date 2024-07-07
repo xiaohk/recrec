@@ -121,6 +121,7 @@
     display: flex;
     align-items: center;
     gap: 3px;
+    accent-color: var(--blue-700);
   }
 
   &.select-block {
