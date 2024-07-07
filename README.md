@@ -10,18 +10,50 @@
 
 Recommender for recommendation letter writers 👍
 
-<a href="https://xiaohk.github.io/wordflow"><img width="100%" src='https://i.imgur.com/QaWYWni.png'></a>
+<a href="https://xiaohk.github.io/recrec"><img width="100%" src='https://i.imgur.com/QaWYWni.png'></a>
 
 ## What is RecRec?
 
 RecRec is a practical tool for finding academic recommendation letter writers.
-Whether you are applying for a fellowship, job, or green card petition, RecRec helps you quickly identify the best letter writers.
+Whether you are preparing for your tenure package, job application, or green card petition, RecRec helps you quickly identify the best letter writers.
 RecRec highlights connections between you and potential recommenders and lets you filter by citations, awards, and other criteria.
 Save time and get the most impactful recommendations with RecRec!
+
+## How Does RecRec Work?
+
+RecRec uses [Semantic Scholar's](https://www.semanticscholar.org) citation database to analyze and identify all researchers who have cited your papers.
+In addition, it uses the [Academic Award database](https://github.com/xiaohk/academic-awards) to highlight researchers with awards, such as ACM Fellow and IEEE Fellow.
+Finally, RecRec provides an easy-to-use interface to help you quickly sort, filter, and select potential recommenders.
 
 ## Get Started
 
 To use RecRec, visit: <https://xiaohk.github.io/recrec/>.
+
+To find potential recommendation letter writers, follow these three steps:
+
+<table>
+  <tr>
+    <td><strong>Step 1</strong></td>
+    <td>Type your name to identify your semantic scholar profile</td>
+  </tr>
+  <tr></tr>
+  <tr>
+    <td><strong>Step 2</strong></td>
+    <td>Select your most representative papers</td>
+  </tr>
+  <tr></tr>
+  <tr>
+    <td><strong>Step 3</strong></td>
+    <td>Browse and filter potential letter writers</td>
+  </tr>
+  <tr></tr>
+  <tr>
+    <td><strong>Optional</strong></td>
+    <td>Repeat Steps 2 and 3 if needed</td>
+  </tr>
+  <tr></tr>
+  <tr></tr>
+</table>
 
 ## Developing RecRec
 
