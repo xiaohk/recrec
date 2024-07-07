@@ -427,7 +427,6 @@ button {
   display: flex;
   justify-content: center;
   box-sizing: border-box;
-  text-align: center;
 
   opacity: 1;
   transform: scale(1);
