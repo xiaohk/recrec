@@ -361,9 +361,13 @@
   }
 
   .progress-message {
+    position: relative;
+
     &::after {
+      display: inline;
+      position: absolute;
+      animation: dot-animation steps(1, end) 2000ms infinite;
       content: '';
-      animation: dot 300ms linear infinite;
     }
   }
 
@@ -371,6 +375,24 @@
     font-style: italic;
     color: var(--gray-500);
     margin-top: -6px;
+  }
+}
+
+@keyframes dot-animation {
+  0% {
+    content: '';
+  }
+  25% {
+    content: '.';
+  }
+  50% {
+    content: '..';
+  }
+  75% {
+    content: '...';
+  }
+  100% {
+    content: '';
   }
 }
 

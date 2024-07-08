@@ -1053,7 +1053,7 @@ export class RecRecRecommenderView extends LitElement {
         <sl-progress-ring
           value=${(this.completedStep / this.totalStep) * 100}
         ></sl-progress-ring>
-        <span class="progress-message">Fetching recommender details...</span>
+        <span class="progress-message">Fetching recommender details</span>
         <span class="progress-remain-time"
           >About ${formatRemainTime(this.remainTimeMS)} left</span
         >
