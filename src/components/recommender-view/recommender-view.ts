@@ -138,6 +138,14 @@ export class RecRecRecommenderView extends LitElement {
 
   // Slider ranges
   @state()
+  paperCountRange: SliderRange = {
+    min: 1,
+    max: 2,
+    curValue: 1,
+    initialValue: 1
+  };
+
+  @state()
   citationTimeRange: SliderRange = {
     min: 1,
     max: 2,
@@ -155,7 +163,7 @@ export class RecRecRecommenderView extends LitElement {
 
   // Sorting and filter
   @state()
-  sortBy: 'citeTimes' | 'hIndex' = 'citeTimes';
+  sortBy: 'citeTimes' | 'hIndex' | 'paperCount' = 'paperCount';
 
   curShownCardSizeMultiplier = 1;
 
@@ -249,6 +257,13 @@ export class RecRecRecommenderView extends LitElement {
       this.remainTimeMS = DEFAULT_REMAIN_TIME;
 
       // Reset the sliders and checkboxes
+      this.paperCountRange = {
+        min: 1,
+        max: 2,
+        curValue: 1,
+        initialValue: 1
+      };
+
       this.citationTimeRange = {
         min: 1,
         max: 2,
@@ -564,6 +579,9 @@ export class RecRecRecommenderView extends LitElement {
     this.citationTimeRange.min = minCitationTimes;
     this.citationTimeRange.max = maxCitationTimes;
 
+    this.paperCountRange.min = minPaperCount;
+    this.paperCountRange.max = maxPaperCount;
+
     this.checkedSelectedPaperIDs = structuredClone(this.selectedPaperIDs);
 
     // Update the view
@@ -617,6 +635,8 @@ export class RecRecRecommenderView extends LitElement {
       }
 
       // Slider filters
+      const paperCountOK =
+        recommender.paperCount! >= this.paperCountRange.curValue;
       const hIndexOK = recommender.hIndex! >= this.hIndexRange.curValue;
       const citeTimesOK =
         recommender.citeTimes! >= this.citationTimeRange.curValue;
@@ -635,6 +655,7 @@ export class RecRecRecommenderView extends LitElement {
           recommender.affiliation !== undefined);
 
       if (
+        paperCountOK &&
         hIndexOK &&
         citeTimesOK &&
         excludeCollaboratorOK &&
@@ -650,6 +671,8 @@ export class RecRecRecommenderView extends LitElement {
       recommenders.sort((a, b) => b.citeTimes! - a.citeTimes!);
     } else if (this.sortBy === 'hIndex') {
       recommenders.sort((a, b) => b.hIndex! - a.hIndex!);
+    } else if (this.sortBy === 'paperCount') {
+      recommenders.sort((a, b) => b.paperCount! - a.paperCount!);
     }
 
     this.curRecommendersSize = recommenders.length;
@@ -682,10 +705,22 @@ export class RecRecRecommenderView extends LitElement {
     this.updateCitationView();
   }
 
+  paperCountSliderChanged(e: CustomEvent<number>) {
+    const count = Math.round(e.detail);
+    const newPaperCountRange = { ...this.paperCountRange };
+    newPaperCountRange.curValue = count;
+    this.paperCountRange = newPaperCountRange;
+
+    // Trigger a new recommender view update
+    this.updateCitationView();
+  }
+
   selectChanged(e: InputEvent) {
     const curValue = (e.currentTarget as HTMLSelectElement).value;
     if (curValue === 'hIndex') {
-      this.sortBy = curValue;
+      this.sortBy = 'hIndex';
+    } else if (curValue === 'paperCount') {
+      this.sortBy = 'paperCount';
     } else {
       this.sortBy = 'citeTimes';
     }
@@ -974,7 +1009,8 @@ export class RecRecRecommenderView extends LitElement {
                 this.selectChanged(e);
               }}
             >
-              <option value="citeTimes">Citing my works</option>
+              <option value="paperCount">Papers citing me</option>
+              <option value="citeTimes">Times citing me</option>
               <option value="hIndex">H-Index</option>
             </select>
           </div>
@@ -986,7 +1022,22 @@ export class RecRecRecommenderView extends LitElement {
       <div class="control-section control-section-slider">
         <div class="control-block slider-block">
           <div class="citation-slider-label">
-            Cited my works ≥ ${this.citationTimeRange.curValue} times
+            Papers citing my work ≥ ${this.paperCountRange.curValue}
+          </div>
+          <nightjar-slider
+            id="slider-paper-count"
+            @valueChanged=${(e: CustomEvent<number>) =>
+              this.paperCountSliderChanged(e)}
+            min=${this.paperCountRange.min}
+            max=${this.paperCountRange.max}
+            curValue=${this.paperCountRange.initialValue}
+            .styleConfig=${SLIDER_STYLE}
+          ></nightjar-slider>
+        </div>
+
+        <div class="control-block slider-block">
+          <div class="citation-slider-label">
+            Cited my work ≥ ${this.citationTimeRange.curValue} times
           </div>
           <nightjar-slider
             id="slider-citation-time"
@@ -1087,8 +1138,8 @@ export class RecRecRecommenderView extends LitElement {
             <div class="table-title">
               <span
                 >${this.overlayPaperCountsType === 'citeTimes'
-                  ? 'My papers & Citations by the recommender'
-                  : "Recommender's papers & Citations of my work"}</span
+                  ? 'My papers & citations by the recommender'
+                  : "Recommender's papers & citations of my work"}</span
               >
             </div>
 

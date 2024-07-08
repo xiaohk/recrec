@@ -21,7 +21,7 @@ import authorCitationSearchMockJSON7 from '../../test/api-responses/author-citat
 import authorCitationSearchMockJSON8 from '../../test/api-responses/author-citation-search-9-8.json';
 import authorCitationSearchMockJSON9 from '../../test/api-responses/author-citation-search-9-9.json';
 
-const MOCK_HTTP_CALL = true;
+const MOCK_HTTP_CALL = false;
 
 const paperSearchMock = paperSearchMockJSON as SemanticPaperSearchResponse;
 const citationSearchMock =
