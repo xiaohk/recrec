@@ -10,17 +10,18 @@ import { downloadJSON } from '@xiaohk/utils';
 
 import paperSearchMockJSON from '../../test/api-responses/paper-search.json';
 import citationSearchMockJSON from '../../test/api-responses/citation-search.json';
-import authorCitationSearchMockJSON0 from '../../test/api-responses/author-citation-search-8-0.json';
-import authorCitationSearchMockJSON1 from '../../test/api-responses/author-citation-search-8-1.json';
-import authorCitationSearchMockJSON2 from '../../test/api-responses/author-citation-search-8-2.json';
-import authorCitationSearchMockJSON3 from '../../test/api-responses/author-citation-search-8-3.json';
-import authorCitationSearchMockJSON4 from '../../test/api-responses/author-citation-search-8-4.json';
-import authorCitationSearchMockJSON5 from '../../test/api-responses/author-citation-search-8-5.json';
-import authorCitationSearchMockJSON6 from '../../test/api-responses/author-citation-search-8-6.json';
-import authorCitationSearchMockJSON7 from '../../test/api-responses/author-citation-search-8-7.json';
-import authorCitationSearchMockJSON8 from '../../test/api-responses/author-citation-search-8-8.json';
+import authorCitationSearchMockJSON0 from '../../test/api-responses/author-citation-search-9-0.json';
+import authorCitationSearchMockJSON1 from '../../test/api-responses/author-citation-search-9-1.json';
+import authorCitationSearchMockJSON2 from '../../test/api-responses/author-citation-search-9-2.json';
+import authorCitationSearchMockJSON3 from '../../test/api-responses/author-citation-search-9-3.json';
+import authorCitationSearchMockJSON4 from '../../test/api-responses/author-citation-search-9-4.json';
+import authorCitationSearchMockJSON5 from '../../test/api-responses/author-citation-search-9-5.json';
+import authorCitationSearchMockJSON6 from '../../test/api-responses/author-citation-search-9-6.json';
+import authorCitationSearchMockJSON7 from '../../test/api-responses/author-citation-search-9-7.json';
+import authorCitationSearchMockJSON8 from '../../test/api-responses/author-citation-search-9-8.json';
+import authorCitationSearchMockJSON9 from '../../test/api-responses/author-citation-search-9-9.json';
 
-const MOCK_HTTP_CALL = false;
+const MOCK_HTTP_CALL = true;
 
 const paperSearchMock = paperSearchMockJSON as SemanticPaperSearchResponse;
 const citationSearchMock =
@@ -36,7 +37,8 @@ const authorCitationSearchMocks = [
   authorCitationSearchMockJSON5 as SemanticAuthorDetail[],
   authorCitationSearchMockJSON6 as SemanticAuthorDetail[],
   authorCitationSearchMockJSON7 as SemanticAuthorDetail[],
-  authorCitationSearchMockJSON8 as SemanticAuthorDetail[]
+  authorCitationSearchMockJSON8 as SemanticAuthorDetail[],
+  authorCitationSearchMockJSON9 as SemanticAuthorDetail[]
 ];
 
 /**
@@ -104,13 +106,14 @@ export const searchAuthorDetails = async (
   try {
     const response = await fetch(url, options);
     const data = (await response.json()) as SemanticAuthorDetail[];
+
+    // downloadJSON(data, null, 'author.json');
+
     return data;
   } catch (e) {
     console.error('API error', e);
     throw new Error(`Fetch error when getting author details, status: ${e}`);
   }
-
-  // downloadJSON(data, null, 'author.json');
 };
 
 export const getAllPapersFromAuthor = async (authorID: string) => {
@@ -171,7 +174,7 @@ export const getPaperCitations = async (paperIDs: string[]) => {
 
   const baseURL = 'https://api.semanticscholar.org/graph/v1/paper/batch';
   const parameters: Record<string, string> = {
-    fields: 'paperId,citations.authors'
+    fields: 'paperId,citations.authors,citations.title'
   };
   const encodedParameters = new URLSearchParams(parameters);
 

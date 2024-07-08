@@ -24,6 +24,7 @@ export interface SemanticCitationAuthor {
 
 export interface SemanticCitation {
   paperId: string;
+  title: string;
   authors: SemanticCitationAuthor[];
 }
 

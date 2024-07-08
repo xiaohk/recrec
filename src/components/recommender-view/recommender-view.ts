@@ -36,6 +36,7 @@ import '../slider/slider';
 import '@shoelace-style/shoelace/dist/themes/light.css';
 import componentCSS from './recommender-view.css?inline';
 import iconHIndex from '../../images/icon-hindex-c.svg?raw';
+import iconFile from '../../images/icon-file-c.svg?raw';
 import iconCiteTimes from '../../images/icon-cite-times-c.svg?raw';
 
 const DEV_MODE = true;
@@ -48,6 +49,7 @@ const SLIDER_STYLE = {
   thumbColor: config.colors['blue-700'],
   alignInner: false
 };
+
 const AWARD_NAME_MAP: Record<AcademicAward, string> = {
   [AcademicAward.AAAI_FELLOW]: 'AAAI Fellow',
   [AcademicAward.AAAS_FELLOW]: 'AAAS Fellow',
@@ -70,6 +72,7 @@ interface Recommender {
   affiliation?: string;
   hIndex?: number;
   citeTimes?: number;
+  paperCount?: number;
   url?: string;
   awards: string[];
 }
@@ -105,9 +108,14 @@ export class RecRecRecommenderView extends LitElement {
   selectedPaperIDs = new Set<string>();
   checkedSelectedPaperIDs = new Set<string>();
 
-  citationAuthorCount: Map<string, number>;
   allAuthors: Map<string, Recommender>;
+
   paperCitingAuthorCountMap: Map<string, Map<string, number>>;
+  paperCitingAuthorCountSumMap: Map<string, number>;
+
+  authorPaperCiteTimesMap: Map<string, Map<string, number>>;
+  authorPaperCiteTimesSumMap: Map<string, number>;
+
   myCollaborators: Set<string>;
 
   allRecommenders: Recommender[];
@@ -168,6 +176,9 @@ export class RecRecRecommenderView extends LitElement {
   @state()
   overlayPaperCounts: [string, number][];
 
+  @state()
+  overlayPaperCountsType: 'citeTimes' | 'paperCount' = 'citeTimes';
+
   curClickedCiteTimeAuthorID: string | null = null;
   overlayCleanup = () => {};
 
@@ -182,9 +193,14 @@ export class RecRecRecommenderView extends LitElement {
   constructor() {
     super();
 
-    this.citationAuthorCount = new Map<string, number>();
     this.allAuthors = new Map<string, Recommender>();
+
     this.paperCitingAuthorCountMap = new Map<string, Map<string, number>>();
+    this.paperCitingAuthorCountSumMap = new Map<string, number>();
+
+    this.authorPaperCiteTimesMap = new Map<string, Map<string, number>>();
+    this.authorPaperCiteTimesSumMap = new Map<string, number>();
+
     this.myCollaborators = new Set<string>();
 
     this.allRecommenders = [];
@@ -211,9 +227,11 @@ export class RecRecRecommenderView extends LitElement {
       !setsAreEqual(this.selectedPaperIDs, this.checkedSelectedPaperIDs)
     ) {
       // Reset mappings
-      this.citationAuthorCount = new Map<string, number>();
       this.allAuthors = new Map<string, Recommender>();
+      this.paperCitingAuthorCountSumMap = new Map<string, number>();
       this.paperCitingAuthorCountMap = new Map<string, Map<string, number>>();
+      this.authorPaperCiteTimesMap = new Map<string, Map<string, number>>();
+      this.authorPaperCiteTimesSumMap = new Map<string, number>();
       this.myCollaborators = new Set<string>();
 
       this.updateCitations().then(
@@ -314,22 +332,46 @@ export class RecRecRecommenderView extends LitElement {
       }
     }
 
-    // Count the authors in the citations
-    const citationAuthorCount = new Map<string, number>();
+    // Count the number of times an author has cited my work
+    const paperCitingAuthorCountSumMap = new Map<string, number>();
 
-    // Map paper id => Map <citing author, cite count to that paper>
+    // Map author id => Map <paper (author's paper), number of times that paper cites my work>
+    const authorPaperCiteTimesMap = new Map<string, Map<string, number>>();
+    const paperCiteTimesMap = new Map<string, number>();
+    const authorPaperMap = new Map<string, Set<string>>();
+    const paperIDMap = new Map<string, string>();
+
+    // Map paper id (my paper) => Map <citing author, cite count to that paper>
     const paperCitationAuthorMap = new Map<string, Map<string, number>>();
+    const authorPaperCiteTimesSumMap = new Map<string, number>();
+
     const awardMap = await this.awardMap;
 
     for (const paper of paperCitations) {
       const curCitingAuthorCiteTimes = new Map<string, number>();
 
       for (const citation of paper.citations) {
+        //  Update the times a paper has cited me
+        if (paperCiteTimesMap.has(citation.paperId)) {
+          paperCiteTimesMap.set(
+            citation.paperId,
+            paperCiteTimesMap.get(citation.paperId)! + 1
+          );
+        } else {
+          paperCiteTimesMap.set(citation.paperId, 1);
+        }
+
+        // Update the paper ID => title map
+        if (!paperIDMap.has(citation.paperId)) {
+          paperIDMap.set(citation.paperId, citation.title);
+        }
+
         for (const author of citation.authors) {
           if (author.authorId === null) {
             continue;
           }
 
+          // Update the times an author has cited me
           if (curCitingAuthorCiteTimes.has(author.authorId)) {
             const oldTimes = curCitingAuthorCiteTimes.get(author.authorId)!;
             curCitingAuthorCiteTimes.set(author.authorId, oldTimes + 1);
@@ -337,12 +379,19 @@ export class RecRecRecommenderView extends LitElement {
             curCitingAuthorCiteTimes.set(author.authorId, 1);
           }
 
-          // Update count
-          if (citationAuthorCount.has(author.authorId)) {
-            const oldCount = citationAuthorCount.get(author.authorId)!;
-            citationAuthorCount.set(author.authorId, oldCount + 1);
+          // Track the author's paper
+          if (authorPaperMap.has(author.authorId)) {
+            authorPaperMap.get(author.authorId)!.add(citation.paperId);
           } else {
-            citationAuthorCount.set(author.authorId, 1);
+            authorPaperMap.set(author.authorId, new Set([citation.paperId]));
+          }
+
+          // Update count
+          if (paperCitingAuthorCountSumMap.has(author.authorId)) {
+            const oldCount = paperCitingAuthorCountSumMap.get(author.authorId)!;
+            paperCitingAuthorCountSumMap.set(author.authorId, oldCount + 1);
+          } else {
+            paperCitingAuthorCountSumMap.set(author.authorId, 1);
           }
 
           // Check if the author has any awards
@@ -369,24 +418,64 @@ export class RecRecRecommenderView extends LitElement {
       paperCitationAuthorMap.set(paper.paperId, curCitingAuthorCiteTimes);
     }
 
+    // Resolve the author => <author's paper title, citing times> map
+    for (const author of authorPaperMap.keys()) {
+      const papers = authorPaperMap.get(author)!;
+      const curPaperCiteTimesMap = new Map<string, number>();
+      for (const paper of papers) {
+        const paperTitle = paperIDMap.get(paper)!;
+        curPaperCiteTimesMap.set(paperTitle, paperCiteTimesMap.get(paper)!);
+      }
+      authorPaperCiteTimesMap.set(author, curPaperCiteTimesMap);
+
+      // Also count the papers that the author has that cite my work
+      authorPaperCiteTimesSumMap.set(author, papers.size);
+    }
+
     this.paperCitingAuthorCountMap = paperCitationAuthorMap;
-    this.citationAuthorCount = citationAuthorCount;
+    this.paperCitingAuthorCountSumMap = paperCitingAuthorCountSumMap;
+
+    this.authorPaperCiteTimesMap = authorPaperCiteTimesMap;
+    this.authorPaperCiteTimesSumMap = authorPaperCiteTimesSumMap;
 
     // Find the min/max of the times an author cited my work
     let minCitationTimes = Infinity;
     let maxCitationTimes = -Infinity;
 
-    for (const [authorID, citeTimes] of citationAuthorCount.entries()) {
+    for (const [
+      authorID,
+      citeTimes
+    ] of paperCitingAuthorCountSumMap.entries()) {
       minCitationTimes = Math.min(minCitationTimes, citeTimes);
       maxCitationTimes = Math.max(maxCitationTimes, citeTimes);
 
       // Copy the citation times info to `allAuthors`
       const authorInfo = this.allAuthors.get(authorID);
       if (authorInfo === undefined) {
+        console.error(`Can't find author info for ${authorID}`);
         throw Error(`Can't find author info for ${authorID}`);
       }
 
       authorInfo.citeTimes = citeTimes;
+      this.allAuthors.set(authorID, authorInfo);
+    }
+
+    // Find the min/max of the papers an author has that cite my work
+    let minPaperCount = Infinity;
+    let maxPaperCount = -Infinity;
+
+    for (const [authorID, paperCount] of authorPaperCiteTimesSumMap.entries()) {
+      minPaperCount = Math.min(minPaperCount, paperCount);
+      maxPaperCount = Math.max(maxPaperCount, paperCount);
+
+      // Copy the paper count info to `allAuthors`
+      const authorInfo = this.allAuthors.get(authorID);
+      if (authorInfo === undefined) {
+        console.error(`Can't find author info for ${authorID}`);
+        throw Error(`Can't find author info for ${authorID}`);
+      }
+
+      authorInfo.paperCount = paperCount;
       this.allAuthors.set(authorID, authorInfo);
     }
 
@@ -434,6 +523,7 @@ export class RecRecRecommenderView extends LitElement {
         }
 
         if (!this.allAuthors.has(author.authorId)) {
+          console.error(`Can't find author ${author.authorId}, ${author.name}`);
           throw new Error(
             `Can't find author ${author.authorId}, ${author.name}`
           );
@@ -486,7 +576,7 @@ export class RecRecRecommenderView extends LitElement {
     this.allRecommenders = [];
     this.curShownCardSizeMultiplier = 1;
 
-    for (const [author, _] of this.citationAuthorCount.entries()) {
+    for (const [author, _] of this.paperCitingAuthorCountSumMap.entries()) {
       const authorInfo = this.allAuthors.get(author);
       if (authorInfo === undefined) {
         console.error(`Fail to get info for author: ${author}`);
@@ -505,6 +595,7 @@ export class RecRecRecommenderView extends LitElement {
         name: authorInfo.name,
         hIndex: authorInfo.hIndex || 0,
         citeTimes: authorInfo.citeTimes,
+        paperCount: authorInfo.paperCount,
         url: authorInfo.url,
         affiliation: authorInfo.affiliation,
         awards: authorInfo.awards
@@ -620,7 +711,11 @@ export class RecRecRecommenderView extends LitElement {
     contentList.scrollTop = scrollTop;
   }
 
-  async citeTimeButtonClicked(e: MouseEvent, recommender: Recommender) {
+  async citeTimeButtonClicked(
+    e: MouseEvent,
+    recommender: Recommender,
+    type: 'paperCount' | 'citeTimes'
+  ) {
     e.stopPropagation();
     e.preventDefault();
 
@@ -641,7 +736,13 @@ export class RecRecRecommenderView extends LitElement {
     const anchor = e.currentTarget as HTMLElement;
 
     // Compute the number of times that this author has cite each paper
-    this.overlayPaperCounts = this.getPaperCiteCounts(recommender.authorID);
+    if (type === 'citeTimes') {
+      this.overlayPaperCounts = this.getPaperCiteCounts(recommender.authorID);
+    } else {
+      this.overlayPaperCounts = this.getPaperCounts(recommender.authorID);
+    }
+    this.overlayPaperCountsType = type;
+
     await this.updateComplete;
 
     const updateOverlay = () => {
@@ -722,6 +823,25 @@ export class RecRecRecommenderView extends LitElement {
     return paperCounts;
   }
 
+  getPaperCounts(authorID: string) {
+    const paperCounts: [string, number][] = [];
+
+    const paperMap = this.authorPaperCiteTimesMap.get(authorID);
+    if (paperMap === undefined) {
+      console.error(`Can't find author ${authorID}`);
+      throw Error(`Can't find author ${authorID}`);
+    }
+
+    for (const [paper, count] of paperMap.entries()) {
+      paperCounts.push([paper, count]);
+    }
+
+    // Sort the papers by the cite times
+    paperCounts.sort((a, b) => b[1] - a[1]);
+
+    return paperCounts;
+  }
+
   //==========================================================================||
   //                           Templates and Styles                           ||
   //==========================================================================||
@@ -755,10 +875,24 @@ export class RecRecRecommenderView extends LitElement {
 
           <div class="info-bar icons">
             <div
+              class="info-block paper-count info-icon"
+              tabindex="0"
+              @click=${(e: MouseEvent) =>
+                this.citeTimeButtonClicked(e, recommender, 'paperCount')}
+              @touchstart=${(e: TouchEvent) => {
+                e.stopPropagation();
+              }}
+              @blur=${() => this.citeTimeBlurred()}
+            >
+              <span class="svg-icon">${unsafeHTML(iconFile)}</span>
+              ${recommender.paperCount}
+            </div>
+
+            <div
               class="info-block cite-time info-icon"
               tabindex="0"
               @click=${(e: MouseEvent) =>
-                this.citeTimeButtonClicked(e, recommender)}
+                this.citeTimeButtonClicked(e, recommender, 'citeTimes')}
               @touchstart=${(e: TouchEvent) => {
                 e.stopPropagation();
               }}
@@ -949,7 +1083,19 @@ export class RecRecRecommenderView extends LitElement {
         </div>
 
         <div id="paper-overlay" class="popper-tooltip hidden" role="tooltip">
-          <div class="popper-content">${paperOverlayContent}</div>
+          <div class="popper-content">
+            <div class="table-title">
+              <span
+                >${this.overlayPaperCountsType === 'citeTimes'
+                  ? 'My papers & Citations by the recommender'
+                  : "Recommender's papers & Citations of my work"}</span
+              >
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="paper-table">${paperOverlayContent}</div>
+          </div>
           <div class="popper-arrow"></div>
         </div>
       </div>

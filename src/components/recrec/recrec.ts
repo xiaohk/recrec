@@ -53,14 +53,14 @@ export class RecRecApp extends LitElement {
   //==========================================================================||
   constructor() {
     super();
-    // this.selectedProfile = {
-    //   authorId: '1390877819',
-    //   name: 'Zijie J. Wang',
-    //   affiliations: ['Georgia Tech'],
-    //   homepage: 'https://zijie.wang',
-    //   paperCount: 42,
-    //   citationCount: 1716
-    // };
+    this.selectedProfile = {
+      authorId: '1390877819',
+      name: 'Zijie J. Wang',
+      affiliations: ['Georgia Tech'],
+      homepage: 'https://zijie.wang',
+      paperCount: 42,
+      citationCount: 1716
+    };
   }
 
   /**

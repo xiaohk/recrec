@@ -319,6 +319,14 @@
       gap: 2px;
     }
 
+    &.paper-count {
+      gap: 2px;
+      .svg-icon {
+        width: 0.8em;
+        height: 0.8em;
+      }
+    }
+
     &:hover {
       background-color: var(--gray-200);
     }
@@ -454,6 +462,36 @@ button {
     max-width: 300px;
     max-height: 200px;
     line-height: 1.5;
+
+    padding: 2px 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+
+    display: flex;
+    flex-flow: column;
+  }
+
+  .table-title {
+    padding: 0 2px;
+    display: flex;
+    justify-content: space-between;
+    box-sizing: border-box;
+  }
+
+  .separator {
+    width: 100%;
+    background: var(--gray-600);
+    height: 1px;
+    margin: 3px 0;
+  }
+
+  .paper-table {
+    width: 100%;
+    flex: 1;
+    padding: 0 2px;
+    box-sizing: border-box;
+
     overflow-x: hidden;
     overflow-y: auto;
 
@@ -461,10 +499,6 @@ button {
     grid-template-columns: auto min-content;
     column-gap: 3px;
     row-gap: 2px;
-    padding: 2px;
-
-    user-select: none;
-    -webkit-user-select: none;
   }
 
   .popper-arrow {
