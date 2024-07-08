@@ -113,7 +113,7 @@ export class RecRecPaperView extends LitElement {
     this.notifyParentPapers(this.papers);
 
     this.isCompleted = true;
-    console.log(this.papers);
+    // console.log(this.papers);
   }
 
   formatPaperAuthor(paper: SemanticPaper) {

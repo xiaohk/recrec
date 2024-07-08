@@ -38,6 +38,8 @@ import componentCSS from './recommender-view.css?inline';
 import iconHIndex from '../../images/icon-hindex-c.svg?raw';
 import iconFile from '../../images/icon-file-c.svg?raw';
 import iconCiteTimes from '../../images/icon-cite-times-c.svg?raw';
+import iconExternal from '../../images/icon-external-link.svg?raw';
+import iconClick from '../../images/icon-click.svg?raw';
 
 const DEV_MODE = true;
 const MAX_RECOMMENDER_NUM = 500;
@@ -83,6 +85,8 @@ interface SliderRange {
   curValue: number;
   initialValue: number;
 }
+
+let descriptionTooltipTimer: number | null = null;
 
 /**
  * Recommender view element.
@@ -181,11 +185,17 @@ export class RecRecRecommenderView extends LitElement {
   @query('#paper-overlay')
   paperOverlayElement: HTMLElement | undefined;
 
+  @query('#description-overlay')
+  descriptionOverlayElement: HTMLElement | undefined;
+
   @state()
   overlayPaperCounts: [string, number][];
 
   @state()
   overlayPaperCountsType: 'citeTimes' | 'paperCount' = 'citeTimes';
+
+  @state()
+  overlayDescriptionType: 'citeTimes' | 'paperCount' | 'hIndex' = 'citeTimes';
 
   curClickedCiteTimeAuthorID: string | null = null;
   overlayCleanup = () => {};
@@ -514,7 +524,7 @@ export class RecRecRecommenderView extends LitElement {
     let maxHIndex = -Infinity;
 
     for (const [i, chunk] of authorIDChunks.entries()) {
-      console.log(`Chunk: ${i}`);
+      // console.log(`Chunk: ${i}`);
       const startTime = performance.now();
 
       let retry = 3;
@@ -759,6 +769,9 @@ export class RecRecRecommenderView extends LitElement {
       return;
     }
 
+    // Hide the description tooltip
+    this.citeTimeButtonMouseLeft(e);
+
     if (this.curClickedCiteTimeAuthorID === recommender.authorID) {
       // This overlay is already shown. We hide it if the user clicks the button (again)
       this.paperOverlayElement.classList.add('hidden');
@@ -799,6 +812,57 @@ export class RecRecRecommenderView extends LitElement {
 
     this.curClickedCiteTimeAuthorID = recommender.authorID;
     this.paperOverlayElement.classList.remove('hidden');
+  }
+
+  citeTimeButtonMouseEntered(
+    e: MouseEvent,
+    type: 'paperCount' | 'citeTimes' | 'hIndex'
+  ) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (!this.descriptionOverlayElement) {
+      console.error('descriptionOverlayElement are not initialized yet.');
+      return;
+    }
+
+    const anchor = e.currentTarget as HTMLElement;
+
+    if (descriptionTooltipTimer) {
+      clearTimeout(descriptionTooltipTimer);
+    }
+
+    descriptionTooltipTimer = setTimeout(async () => {
+      this.overlayDescriptionType = type;
+      await this.updateComplete;
+
+      updatePopperOverlay(
+        this.descriptionOverlayElement!,
+        anchor,
+        'top',
+        true,
+        10,
+        300
+      );
+
+      this.descriptionOverlayElement!.classList.remove('hidden');
+    }, 500);
+  }
+
+  citeTimeButtonMouseLeft(e: MouseEvent) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (!this.descriptionOverlayElement) {
+      console.error('descriptionOverlayElement are not initialized yet.');
+      return;
+    }
+
+    if (descriptionTooltipTimer) {
+      clearTimeout(descriptionTooltipTimer);
+    }
+
+    this.descriptionOverlayElement.classList.add('hidden');
   }
 
   citeTimeBlurred() {
@@ -914,6 +978,11 @@ export class RecRecRecommenderView extends LitElement {
               tabindex="0"
               @click=${(e: MouseEvent) =>
                 this.citeTimeButtonClicked(e, recommender, 'paperCount')}
+              @mouseenter=${(e: MouseEvent) =>
+                this.citeTimeButtonMouseEntered(e, 'paperCount')}
+              @mouseleave=${(e: MouseEvent) => {
+                this.citeTimeButtonMouseLeft(e);
+              }}
               @touchstart=${(e: TouchEvent) => {
                 e.stopPropagation();
               }}
@@ -928,6 +997,11 @@ export class RecRecRecommenderView extends LitElement {
               tabindex="0"
               @click=${(e: MouseEvent) =>
                 this.citeTimeButtonClicked(e, recommender, 'citeTimes')}
+              @mouseenter=${(e: MouseEvent) =>
+                this.citeTimeButtonMouseEntered(e, 'citeTimes')}
+              @mouseleave=${(e: MouseEvent) => {
+                this.citeTimeButtonMouseLeft(e);
+              }}
               @touchstart=${(e: TouchEvent) => {
                 e.stopPropagation();
               }}
@@ -940,6 +1014,11 @@ export class RecRecRecommenderView extends LitElement {
             <a
               class="info-block info-icon"
               href="${recommender.url!}"
+              @mouseenter=${(e: MouseEvent) =>
+                this.citeTimeButtonMouseEntered(e, 'hIndex')}
+              @mouseleave=${(e: MouseEvent) => {
+                this.citeTimeButtonMouseLeft(e);
+              }}
               target="_blank"
             >
               <span class="svg-icon">${unsafeHTML(iconHIndex)}</span>
@@ -1104,6 +1183,28 @@ export class RecRecRecommenderView extends LitElement {
       </div>
     `;
 
+    // Compile the description overlay
+    let description = 'Papers by this recommender citing my work';
+    let descriptionIcon = html`<span class="svg-icon"
+      >${unsafeHTML(iconClick)}</span
+    >`;
+
+    if (this.overlayDescriptionType === 'citeTimes') {
+      description = 'Total citations by this recommender';
+    } else if (this.overlayDescriptionType === 'hIndex') {
+      description = 'H-Index';
+      descriptionIcon = html`<span class="svg-icon external-icon"
+        >${unsafeHTML(iconExternal)}</span
+      >`;
+    }
+
+    const descriptionOverlay = html`
+      <div class="description">
+        <span>${description}</span>
+        ${descriptionIcon}
+      </div>
+    `;
+
     return html`
       <div class="recommender-view">
         ${progressRing} ${MOBILE_MODE ? controlPopBar : controlSideBar}
@@ -1147,6 +1248,15 @@ export class RecRecRecommenderView extends LitElement {
 
             <div class="paper-table">${paperOverlayContent}</div>
           </div>
+          <div class="popper-arrow"></div>
+        </div>
+
+        <div
+          id="description-overlay"
+          class="popper-tooltip hidden"
+          role="tooltip"
+        >
+          <div class="popper-content">${descriptionOverlay}</div>
           <div class="popper-arrow"></div>
         </div>
       </div>

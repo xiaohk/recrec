@@ -444,8 +444,22 @@ button {
     opacity 150ms linear,
     transform 150ms linear;
 
+  &#description-overlay {
+    transition:
+      opacity 100ms linear,
+      transform 100ms linear;
+  }
+
   &[placement='right'] {
     transform-origin: left center;
+  }
+
+  &[placement='bottom'] {
+    transform-origin: top center;
+  }
+
+  &[placement='top'] {
+    transform-origin: bottom center;
   }
 
   &.hidden {
@@ -470,6 +484,20 @@ button {
 
     display: flex;
     flex-flow: column;
+  }
+
+  .description {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+
+    .external-icon {
+      margin-top: 2px;
+      width: 0.7em;
+      height: 0.7em;
+      color: var(--gray-400);
+    }
   }
 
   .table-title {

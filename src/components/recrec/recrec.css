@@ -7,15 +7,15 @@
   box-sizing: border-box;
 
   /* overflow: hidden; */
-  /* border: 1px solid var(--gray-400); */
+  border: 1px solid var(--gray-300);
   overflow: hidden;
   border-radius: var(--border-radius);
   background: white;
-  box-shadow:
+  /* box-shadow:
     0 0 2px hsla(0, 0%, 0%, 0.1),
     0 0 10px hsla(0, 0%, 0%, 0.04),
     0 0 15px hsla(0, 0%, 0%, 0.04),
-    0 0 30px hsla(0, 0%, 0%, 0.04);
+    0 0 30px hsla(0, 0%, 0%, 0.04); */
 }
 
 button {
