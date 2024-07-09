@@ -9,7 +9,7 @@
   /* overflow: hidden; */
   border: 1px solid var(--gray-300);
   overflow: hidden;
-  border-radius: var(--border-radius);
+  /* border-radius: var(--border-radius); */
   background: white;
   /* box-shadow:
     0 0 2px hsla(0, 0%, 0%, 0.1),

@@ -10,7 +10,16 @@
 
 Recommender for recommendation letter writers 👍
 
-<a href="https://xiaohk.github.io/recrec"><img width="100%" src='https://i.imgur.com/QaWYWni.png'></a>
+<table>
+  <tr>
+    <td colspan="2"><a href="https://xiaohk.github.io/recrec"><img width="100%" src='https://github.com/xiaohk/gifs/blob/main/recrec-600.gif?raw=true'></a></td>
+  </tr>
+  <tr></tr>
+  <tr align="center">
+    <td><a href="https://xiaohk.github.io/recrec">🚀 RecRec Demo</a></td>
+    <td><a href="https://youtu.be/p1mI650PjPc">📺 Demo Video</a></td>
+  </tr>
+</table>
 
 ## What is RecRec?
 
@@ -18,6 +27,13 @@ RecRec is a practical tool for finding academic recommendation letter writers.
 Whether you are preparing for your tenure package, job application, or green card petition, RecRec helps you quickly identify the best letter writers.
 RecRec highlights connections between you and potential recommenders and lets you filter by citations, awards, and other criteria.
 Save time and get the most impactful recommendations with RecRec!
+
+### Demo Video
+
+<details>
+  <summary>Click to see the high-resolution demo video!</summary>
+  <video src="https://github.com/xiaohk/recrec/assets/15007159/7de298a0-6bf0-41ce-bb24-6dbd1ce84c5a"></video>
+</details>
 
 ## How Does RecRec Work?
 
