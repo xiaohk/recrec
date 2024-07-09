@@ -65,7 +65,7 @@ To find potential recommendation letter writers, follow these three steps:
   </tr>
   <tr></tr>
   <tr>
-    <td><strong>Optional</strong></td>
+    <td><em>Optional</em></td>
     <td>Repeat Steps 2 and 3 if needed</td>
   </tr>
   <tr></tr>
@@ -99,8 +99,6 @@ Navigate to localhost:3000. You should see RecRec running in your browser :)
 RecRec is created by <a href='https://zijie.wang/' target='_blank'>Jay Wang</a>.
 
 ## Citation
-
-To learn more about RecRec and social prompt engineering, check out our [research paper](https://arxiv.org/abs/2401.14447).
 
 If you find RecRec useful, please consider citing it.
 
