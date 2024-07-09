@@ -2176,7 +2176,12 @@
             <a href="https://zijie.wang" target="_blank" class="button"
               >By Jay Wang</a
             >
-            <a href="https://zijie.wang" target="_blank" class="button">Code</a>
+            <a
+              href="https://github.com/xiaohk/recrec"
+              target="_blank"
+              class="button"
+              >Code</a
+            >
           </div>
         </div>
         <div class="app-container"><recrec-app></recrec-app></div>
