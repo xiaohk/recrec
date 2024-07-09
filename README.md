@@ -12,7 +12,7 @@ Recommender for recommendation letter writers 👍
 
 <table>
   <tr>
-    <td colspan="2"><a href="https://xiaohk.github.io/recrec"><img width="100%" src='https://github.com/xiaohk/gifs/blob/main/recrec-600.gif?raw=true'></a></td>
+    <td colspan="2"><a href="https://xiaohk.github.io/recrec"><img width="830px" src='https://github.com/xiaohk/gifs/blob/main/recrec-600.gif?raw=true'></a></td>
   </tr>
   <tr></tr>
   <tr align="center">
@@ -32,7 +32,7 @@ Save time and get the most impactful recommendations with RecRec!
 
 <details>
   <summary>Click to see the high-resolution demo video!</summary>
-  <video src="https://github.com/xiaohk/recrec/assets/15007159/7de298a0-6bf0-41ce-bb24-6dbd1ce84c5a"></video>
+  <video src="https://github.com/xiaohk/recrec/assets/15007159/0c8cd6f9-e68c-45fe-9ca2-89c29249b8e8"></video>
 </details>
 
 ## How Does RecRec Work?
