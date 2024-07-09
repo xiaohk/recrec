@@ -6,13 +6,14 @@
 
 [![Github Actions Status](https://github.com/xiaohk/recrec/workflows/build/badge.svg)](https://github.com/xiaohk/recrec/actions/workflows/build.yml)
 [![license](https://img.shields.io/badge/License-MIT-blue)](https://github.com/xiaohk/recrec/blob/main/LICENSE)
-[![npm](https://img.shields.io/npm/v/recrec?color=yellow)](https://www.npmjs.com/package/recrec)
+[![npm](https://img.shields.io/npm/v/recrec?color=orange)](https://www.npmjs.com/package/recrec)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12697177.svg)](https://doi.org/10.5281/zenodo.12697177)
 
 Recommender for recommendation letter writers 👍
 
 <table>
   <tr>
-    <td colspan="2"><a href="https://xiaohk.github.io/recrec"><img width="830px" src='https://github.com/xiaohk/gifs/blob/main/recrec-600.gif?raw=true'></a></td>
+    <td colspan="2"><a href="https://xiaohk.github.io/recrec"><img width="800px" src='https://github.com/xiaohk/gifs/blob/main/recrec-600.gif?raw=true'></a></td>
   </tr>
   <tr></tr>
   <tr align="center">
@@ -97,26 +98,24 @@ Navigate to localhost:3000. You should see RecRec running in your browser :)
 
 RecRec is created by <a href='https://zijie.wang/' target='_blank'>Jay Wang</a>.
 
-<!----
-
 ## Citation
 
 To learn more about RecRec and social prompt engineering, check out our [research paper](https://arxiv.org/abs/2401.14447).
 
+If you find RecRec useful, please consider citing it.
+
 ```bibtex
-@article{wangWordflowSocialPrompt2024,
-  title = {Wordflow: {{Social Prompt Engineering}} for {{Large Language Models}}},
-  shorttitle = {Wordflow},
-  author = {Wang, Zijie J. and Chakravarthy, Aishwarya and Munechika, David and Chau, Duen Horng},
+@misc{wangRecRecRecommenderRecommender2024,
+  title = {{{RecRec}}: {{Recommender}} for {{Recommender Letter Writers}}},
+  shorttitle = {{{RecRec}}},
+  author = {Wang, Zijie J.},
   year = {2024},
-  url = {http://arxiv.org/abs/2401.14447},
-  urldate = {2024-01-29},
-  archiveprefix = {arxiv},
-  journal = {arXiv 2401.14447}
+  doi = {10.5281/ZENODO.12697177},
+  url = {https://zenodo.org/doi/10.5281/zenodo.12697177},
+  urldate = {2024-07-09},
+  copyright = {MIT License}
 }
 ```
-
---->
 
 ## License
 

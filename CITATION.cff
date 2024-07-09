@@ -1,0 +1,14 @@
+abstract: Recommender for recommender letter writers
+authors:
+- family-names: Wang
+  given-names: Zijie J.
+  orcid: 0000-0003-4360-1423
+cff-version: 1.2.0
+date-released: '2024-07-09'
+doi: 10.5281/zenodo.12697229
+license:
+- mit
+repository-code: https://github.com/xiaohk/recrec/tree/v0.0.3
+title: 'RecRec: Recommender for Recommender Letter Writers'
+type: software
+version: v0.0.3
