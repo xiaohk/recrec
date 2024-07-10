@@ -33,7 +33,7 @@ Save time and get the most impactful recommendations with RecRec!
 
 <details>
   <summary>Click to see the high-resolution demo video!</summary>
-  <video src="https://github.com/xiaohk/recrec/assets/15007159/0c8cd6f9-e68c-45fe-9ca2-89c29249b8e8"></video>
+  <video src="https://github.com/xiaohk/recrec/assets/15007159/7eb1e64b-9e13-4426-8b7a-abe41939d5bf"></video>
 </details>
 
 ## How Does RecRec Work?
