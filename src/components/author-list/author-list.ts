@@ -11,7 +11,7 @@ import type {
 import iconPerson from '../../images/icon-person.svg?raw';
 import componentCSS from './author-list.css?inline';
 
-const AUTHORS_PER_PAGE = 100;
+const AUTHORS_PER_PAGE = 50;
 let authorDetailAPITimeout: number | null = null;
 
 /**
@@ -94,7 +94,12 @@ export class RecRecAuthorList extends LitElement {
     }
 
     try {
-      const data = await searchAuthorDetails(this.authors.map(d => d.authorId));
+      const fields =
+        'authorId,name,affiliations,paperCount,citationCount,papers.title';
+      const data = await searchAuthorDetails(
+        this.authors.map(d => d.authorId),
+        fields
+      );
       this.authorDetails = data;
       this.updateIsSearching(false);
     } catch (e) {
@@ -138,6 +143,11 @@ export class RecRecAuthorList extends LitElement {
     )) {
       if (author === null) continue;
 
+      let latestPaper = '';
+      if (author.papers !== undefined && author.papers.length > 0) {
+        latestPaper = author.papers[0].title;
+      }
+
       authors = html`${authors}
         <tr
           class="author-row"
@@ -153,9 +163,9 @@ export class RecRecAuthorList extends LitElement {
               ? ` (${author.affiliations![0]})`
               : ''}
           </td>
-          <td class="paper-count">${author.paperCount} papers</td>
           <td class="citation-count">${author.citationCount} citations</td>
-          <td class="extra-cell"></td>
+          <td class="paper-count">${author.paperCount} papers</td>
+          <td class="paper">"${latestPaper}"</td>
         </tr> `;
     }
 
@@ -165,9 +175,9 @@ export class RecRecAuthorList extends LitElement {
           <colgroup>
             <col class="col-icon" />
             <col class="col-name" />
-            <col class="col-paper-count" />
             <col class="col-citation-count" />
-            <col class="col-filler" />
+            <col class="col-paper-count" />
+            <col class="col-paper" />
           </colgroup>
           ${authors}
         </table>

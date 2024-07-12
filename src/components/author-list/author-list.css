@@ -16,6 +16,7 @@
   width: 100%;
   border-collapse: collapse;
   white-space: nowrap;
+  box-sizing: border-box;
   --cell-padding-right: 50px;
 
   &:has(.author-row) {
@@ -23,32 +24,33 @@
   }
 
   .col-icon {
-    width: 0;
+    width: 0px;
     min-width: min-content;
   }
 
   .col-name {
-    width: 0;
-    min-width: min-content;
-  }
-
-  .col-paper-count {
-    width: 0;
+    width: 0px;
     min-width: min-content;
   }
 
   .col-citation-count {
-    width: 0;
+    width: 0px;
     min-width: min-content;
   }
 
-  .col-filler {
-    width: 100%;
+  .col-paper-count {
+    width: 0px;
+    min-width: min-content;
+  }
+
+  .col-paper {
+    width: 0px;
+    min-width: min-content;
   }
 
   .author-row {
     cursor: pointer;
-    width: 100%;
+    box-sizing: border-box;
 
     .svg-icon {
       color: var(--gray-300);
@@ -67,6 +69,7 @@
     vertical-align: center;
     padding: 3px 0;
     height: 24px;
+    box-sizing: border-box;
   }
 
   .icon {
@@ -75,12 +78,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    width: min-content;
+    position: relative;
+    top: 2px;
   }
 
   .name {
     padding-right: var(--cell-padding-right);
     font-weight: 600;
-    max-width: 500px;
+    max-width: 300px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -96,6 +102,16 @@
   .citation-count {
     color: var(--gray-500);
     vertical-align: top;
+    padding-right: var(--cell-padding-right);
+  }
+
+  .paper {
+    color: var(--gray-500);
+    max-width: 500px;
+    font-style: italic;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
@@ -121,9 +137,37 @@
   .author-table {
     --cell-padding-right: 10px;
 
+    & td {
+      padding-top: 5px;
+      padding-bottom: 5px;
+    }
+
+    .icon {
+      display: none;
+    }
+
     .name {
-      min-width: 100px;
+      padding-left: calc(1rem - 2px);
+      max-width: unset;
+      overflow: unset;
+      text-overflow: unset;
       white-space: wrap;
+    }
+
+    .citation-count {
+      white-space: wrap;
+    }
+
+    .paper-count {
+      max-width: unset;
+      white-space: wrap;
+    }
+
+    .paper {
+      white-space: wrap;
+      overflow: unset;
+      text-overflow: unset;
+      padding-right: calc(1rem - 2px);
     }
   }
 }

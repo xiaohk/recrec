@@ -96,6 +96,7 @@ export interface SemanticAuthorDetailContent {
   paperCount?: number;
   hIndex?: number;
   url?: string;
+  papers?: SemanticPaper[];
 }
 
 export enum Step {
