@@ -80,28 +80,20 @@ export class RecRecAuthorList extends LitElement {
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
-  async updateAuthorDetails() {
+  async updateAuthorDetails(retry = 3) {
     if (this.authors.length === 0) {
       this.authorDetails = [];
       return;
     }
 
-    let done = false;
-    let retry = 3;
-
-    while (!done && retry > 0) {
-      try {
-        const data = await searchAuthorDetails(
-          this.authors.map(d => d.authorId)
-        );
-        this.authorDetails = data;
-        done = true;
-      } catch (e) {
-        await new Promise<void>(resolve => {
-          setTimeout(resolve, 2000);
-        });
-        retry -= 1;
-      }
+    try {
+      const data = await searchAuthorDetails(this.authors.map(d => d.authorId));
+      this.authorDetails = data;
+    } catch (e) {
+      await new Promise<void>(resolve => {
+        setTimeout(resolve, 2000);
+      });
+      await this.updateAuthorDetails(retry - 1);
     }
   }
 

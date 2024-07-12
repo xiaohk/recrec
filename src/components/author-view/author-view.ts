@@ -64,7 +64,7 @@ export class RecRecAuthorView extends LitElement {
   //==========================================================================||
   //                              Event Handlers                              ||
   //==========================================================================||
-  searchInput(e: InputEvent, delay = 200) {
+  searchInput(e: InputEvent, delay = 600) {
     const target = e.currentTarget as HTMLInputElement;
     const query = target.value;
 

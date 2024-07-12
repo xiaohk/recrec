@@ -26,7 +26,6 @@ export default {
 
     const newRequest = new Request(request, {
       headers: {
-        ...request.headers,
         'x-api-key': `${env.SEMANTIC_API}`,
       },
       body: request.body,

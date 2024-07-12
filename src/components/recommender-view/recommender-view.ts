@@ -345,10 +345,22 @@ export class RecRecRecommenderView extends LitElement {
     return awardMap;
   }
 
-  async updateCitations() {
-    console.time('Query citations');
-    const paperCitations = await getPaperCitations([...this.selectedPaperIDs]);
-    console.timeEnd('Query citations');
+  async updateCitations(retry = 3) {
+    let paperCitations: SemanticPaperCitationDetail[] = [];
+
+    try {
+      console.time('Query citations');
+      paperCitations = await getPaperCitations([...this.selectedPaperIDs]);
+      console.timeEnd('Query citations');
+    } catch (e) {
+      await new Promise<void>(resolve =>
+        setTimeout(() => {
+          resolve();
+        }, 1000)
+      );
+      await this.updateCitations(retry - 1);
+      return;
+    }
 
     // Find and store collaborators
     for (const paper of this.papers) {
