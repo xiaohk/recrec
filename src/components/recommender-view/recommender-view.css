@@ -501,8 +501,6 @@ button {
 
     padding: 2px 0;
     box-sizing: border-box;
-    user-select: none;
-    -webkit-user-select: none;
 
     display: flex;
     flex-flow: column;
@@ -527,6 +525,7 @@ button {
     display: flex;
     justify-content: space-between;
     box-sizing: border-box;
+    cursor: default;
   }
 
   .separator {
@@ -564,6 +563,15 @@ button {
     }
   }
 
+  a.cell-paper {
+    color: currentColor;
+    text-decoration: none;
+
+    &:hover {
+      color: color-mix(in lab, currentColor 100%, var(--gray-600) 30%);
+    }
+  }
+
   .cell-paper {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -572,6 +580,7 @@ button {
 
   .cell-count {
     text-align: right;
+    cursor: default;
   }
 }
 

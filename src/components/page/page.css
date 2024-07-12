@@ -42,6 +42,10 @@
     gap: var(--font-u7);
   }
 
+  a {
+    text-decoration: none;
+  }
+
   a.button {
     padding-top: var(--font-d2);
     font-size: var(--font-u6);

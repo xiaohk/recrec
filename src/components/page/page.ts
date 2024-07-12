@@ -53,12 +53,12 @@ export class RecRecPage extends LitElement {
     return html`
       <div class="page">
         <div class="headline">
-          <div class="head-group">
+          <a class="head-group" href="./">
             <div class="svg-icon">${unsafeHTML(recrecIcon)}</div>
             <div class="tag-line">
               Recommender for Recommendation Letter Writers
             </div>
-          </div>
+          </a>
 
           <div class="head-group">
             <a href="https://zijie.wang" target="_blank" class="button"

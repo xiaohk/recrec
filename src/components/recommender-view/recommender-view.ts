@@ -117,7 +117,7 @@ export class RecRecRecommenderView extends LitElement {
   paperCitingAuthorCountMap: Map<string, Map<string, number>>;
   paperCitingAuthorCountSumMap: Map<string, number>;
 
-  authorPaperCiteTimesMap: Map<string, Map<string, number>>;
+  authorPaperCiteTimesMap: Map<string, Map<string, [string, number]>>;
   authorPaperCiteTimesSumMap: Map<string, number>;
 
   myCollaborators: Set<string>;
@@ -189,7 +189,7 @@ export class RecRecRecommenderView extends LitElement {
   descriptionOverlayElement: HTMLElement | undefined;
 
   @state()
-  overlayPaperCounts: [string, number][];
+  overlayPaperCounts: [string, number, string][];
 
   @state()
   overlayPaperCountsType: 'citeTimes' | 'paperCount' = 'citeTimes';
@@ -216,7 +216,10 @@ export class RecRecRecommenderView extends LitElement {
     this.paperCitingAuthorCountMap = new Map<string, Map<string, number>>();
     this.paperCitingAuthorCountSumMap = new Map<string, number>();
 
-    this.authorPaperCiteTimesMap = new Map<string, Map<string, number>>();
+    this.authorPaperCiteTimesMap = new Map<
+      string,
+      Map<string, [string, number]>
+    >();
     this.authorPaperCiteTimesSumMap = new Map<string, number>();
 
     this.myCollaborators = new Set<string>();
@@ -232,7 +235,12 @@ export class RecRecRecommenderView extends LitElement {
   /**
    * This method is called when the DOM is added for the first time
    */
-  firstUpdated() {}
+  firstUpdated() {
+    // Cancel the overlay when user clicks any external area
+    document.addEventListener('click', () => {
+      this.citeTimeBlurred();
+    });
+  }
 
   /**
    * This method is called before new DOM is updated and rendered
@@ -248,7 +256,10 @@ export class RecRecRecommenderView extends LitElement {
       this.allAuthors = new Map<string, Recommender>();
       this.paperCitingAuthorCountSumMap = new Map<string, number>();
       this.paperCitingAuthorCountMap = new Map<string, Map<string, number>>();
-      this.authorPaperCiteTimesMap = new Map<string, Map<string, number>>();
+      this.authorPaperCiteTimesMap = new Map<
+        string,
+        Map<string, [string, number]>
+      >();
       this.authorPaperCiteTimesSumMap = new Map<string, number>();
       this.myCollaborators = new Set<string>();
 
@@ -373,7 +384,10 @@ export class RecRecRecommenderView extends LitElement {
     const paperCitingAuthorCountSumMap = new Map<string, number>();
 
     // Map author id => Map <paper (author's paper), number of times that paper cites my work>
-    const authorPaperCiteTimesMap = new Map<string, Map<string, number>>();
+    const authorPaperCiteTimesMap = new Map<
+      string,
+      Map<string, [string, number]>
+    >();
     const paperCiteTimesMap = new Map<string, number>();
     const authorPaperMap = new Map<string, Set<string>>();
     const paperIDMap = new Map<string, string>();
@@ -458,10 +472,13 @@ export class RecRecRecommenderView extends LitElement {
     // Resolve the author => <author's paper title, citing times> map
     for (const author of authorPaperMap.keys()) {
       const papers = authorPaperMap.get(author)!;
-      const curPaperCiteTimesMap = new Map<string, number>();
+      const curPaperCiteTimesMap = new Map<string, [string, number]>();
       for (const paper of papers) {
         const paperTitle = paperIDMap.get(paper)!;
-        curPaperCiteTimesMap.set(paperTitle, paperCiteTimesMap.get(paper)!);
+        curPaperCiteTimesMap.set(paperTitle, [
+          paper,
+          paperCiteTimesMap.get(paper)!
+        ]);
       }
       authorPaperCiteTimesMap.set(author, curPaperCiteTimesMap);
 
@@ -776,6 +793,8 @@ export class RecRecRecommenderView extends LitElement {
     e.stopPropagation();
     e.preventDefault();
 
+    this.citeTimeBlurred();
+
     if (!this.paperOverlayElement) {
       console.error('paperOverlayElement are not initialized yet.');
       return;
@@ -919,12 +938,12 @@ export class RecRecRecommenderView extends LitElement {
   //                             Private Helpers                              ||
   //==========================================================================||
   getPaperCiteCounts(authorID: string) {
-    const paperCounts: [string, number][] = [];
+    const paperCounts: [string, number, string][] = [];
 
     for (const paper of this.papers) {
       const countMap = this.paperCitingAuthorCountMap.get(paper.paperId);
       if (countMap !== undefined && countMap.has(authorID)) {
-        paperCounts.push([paper.title, countMap.get(authorID)!]);
+        paperCounts.push([paper.title, countMap.get(authorID)!, paper.paperId]);
       }
     }
 
@@ -935,7 +954,7 @@ export class RecRecRecommenderView extends LitElement {
   }
 
   getPaperCounts(authorID: string) {
-    const paperCounts: [string, number][] = [];
+    const paperCounts: [string, number, string][] = [];
 
     const paperMap = this.authorPaperCiteTimesMap.get(authorID);
     if (paperMap === undefined) {
@@ -943,8 +962,8 @@ export class RecRecRecommenderView extends LitElement {
       throw Error(`Can't find author ${authorID}`);
     }
 
-    for (const [paper, count] of paperMap.entries()) {
-      paperCounts.push([paper, count]);
+    for (const [paper, info] of paperMap.entries()) {
+      paperCounts.push([paper, info[1], info[0]]);
     }
 
     // Sort the papers by the cite times
@@ -998,7 +1017,6 @@ export class RecRecRecommenderView extends LitElement {
               @touchstart=${(e: TouchEvent) => {
                 e.stopPropagation();
               }}
-              @blur=${() => this.citeTimeBlurred()}
             >
               <span class="svg-icon">${unsafeHTML(iconFile)}</span>
               ${recommender.paperCount}
@@ -1017,7 +1035,6 @@ export class RecRecRecommenderView extends LitElement {
               @touchstart=${(e: TouchEvent) => {
                 e.stopPropagation();
               }}
-              @blur=${() => this.citeTimeBlurred()}
             >
               <span class="svg-icon">${unsafeHTML(iconCiteTimes)}</span>
               ${recommender.citeTimes}
@@ -1074,9 +1091,14 @@ export class RecRecRecommenderView extends LitElement {
 
     // Compile the paper overlay
     let paperOverlayContent = html``;
-    for (const [paper, count] of this.overlayPaperCounts) {
+    for (const [paper, count, paperID] of this.overlayPaperCounts) {
       paperOverlayContent = html`${paperOverlayContent}
-        <div class="cell-paper">${paper}</div>
+        <a
+          class="cell-paper"
+          target="_blank"
+          href=${`https://www.semanticscholar.org/paper/${paperID}`}
+          >${paper}</a
+        >
         <div class="cell-count">${count}x</div> `;
     }
 
@@ -1246,7 +1268,14 @@ export class RecRecRecommenderView extends LitElement {
           </div>
         </div>
 
-        <div id="paper-overlay" class="popper-tooltip hidden" role="tooltip">
+        <div
+          id="paper-overlay"
+          class="popper-tooltip hidden"
+          role="tooltip"
+          @click=${(e: MouseEvent) => {
+            e.stopPropagation();
+          }}
+        >
           <div class="popper-content">
             <div class="table-title">
               <span
