@@ -8,6 +8,7 @@ import type {
   SemanticAuthorSearch,
   SemanticAuthorDetail
 } from '../../types/common-types';
+import type { RecRecAuthorList } from '../author-list/author-list';
 
 import '@shoelace-style/shoelace/dist/components/input/input.js';
 import '../header-bar/header-bar';
@@ -35,8 +36,14 @@ export class RecRecAuthorView extends LitElement {
   @state()
   showAuthorList = false;
 
+  @state()
+  isSearching = false;
+
   @query('sl-input')
   searchInputComponent: SlInput | undefined;
+
+  @query('recrec-author-list')
+  authorListComponent: RecRecAuthorList | undefined;
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -177,6 +184,9 @@ export class RecRecAuthorView extends LitElement {
               <div class="svg-icon search-icon" slot="prefix">
                 ${unsafeHTML(iconSearch)}
               </div>
+              <div class="svg-icon search-icon" slot="suffix">
+                <div class="loader" ?is-hidden=${!this.isSearching}></div>
+              </div>
             </sl-input>
           </div>
 
@@ -185,6 +195,9 @@ export class RecRecAuthorView extends LitElement {
               .authors=${this.searchAuthors}
               @author-row-clicked=${(e: CustomEvent<SemanticAuthorDetail>) => {
                 this.authorRowClickedHandler(e);
+              }}
+              @is-searching-changed=${(e: CustomEvent<boolean>) => {
+                this.isSearching = e.detail;
               }}
             ></recrec-author-list>
           </div>

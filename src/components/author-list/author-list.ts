@@ -12,6 +12,7 @@ import iconPerson from '../../images/icon-person.svg?raw';
 import componentCSS from './author-list.css?inline';
 
 const AUTHORS_PER_PAGE = 100;
+let authorDetailAPITimeout: number | null = null;
 
 /**
  * Author list element.
@@ -28,7 +29,6 @@ export class RecRecAuthorList extends LitElement {
   authorDetails: SemanticAuthorDetail[] = [];
 
   authorStartIndex = 0;
-  authorDetailAPIRetryID = 0;
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -81,33 +81,48 @@ export class RecRecAuthorList extends LitElement {
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
-  async updateAuthorDetails(retry?: number, retryID?: number) {
+  async updateAuthorDetails(retry = 3) {
     if (this.authors.length === 0) {
       this.authorDetails = [];
       return;
     }
 
-    const retryNum = retry || 3;
+    this.updateIsSearching(true);
 
-    // Quit if a newer query has succeeded
-    if (retryID && retryID != this.authorDetailAPIRetryID) {
-      return;
-    }
-
-    // Record this query as the newest query
-    if (retryID === undefined) {
-      this.authorDetailAPIRetryID += 1;
+    if (authorDetailAPITimeout !== null) {
+      clearTimeout(authorDetailAPITimeout);
     }
 
     try {
       const data = await searchAuthorDetails(this.authors.map(d => d.authorId));
       this.authorDetails = data;
+      this.updateIsSearching(false);
     } catch (e) {
-      await new Promise<void>(resolve => {
-        setTimeout(resolve, 1000);
-      });
-      await this.updateAuthorDetails(retryNum - 1, this.authorDetailAPIRetryID);
+      // Try again after some delay
+      console.error(
+        `Author detail API failed with error (retry remain: ${retry}): ${e}`
+      );
+
+      if (retry > 0) {
+        authorDetailAPITimeout = setTimeout(() => {
+          this.updateAuthorDetails(retry - 1).then(
+            () => {},
+            () => {}
+          );
+        }, 1000);
+      } else {
+        this.updateIsSearching(false);
+      }
     }
+  }
+
+  updateIsSearching(isSearching: boolean) {
+    const event = new CustomEvent<boolean>('is-searching-changed', {
+      bubbles: true,
+      composed: true,
+      detail: isSearching
+    });
+    this.dispatchEvent(event);
   }
 
   //==========================================================================||
