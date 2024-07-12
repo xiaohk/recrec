@@ -28,6 +28,7 @@ export class RecRecAuthorList extends LitElement {
   authorDetails: SemanticAuthorDetail[] = [];
 
   authorStartIndex = 0;
+  authorDetailAPIRetryID = 0;
 
   //==========================================================================||
   //                             Lifecycle Methods                            ||
@@ -80,10 +81,22 @@ export class RecRecAuthorList extends LitElement {
   //==========================================================================||
   //                             Private Helpers                              ||
   //==========================================================================||
-  async updateAuthorDetails(retry = 3) {
+  async updateAuthorDetails(retry?: number, retryID?: number) {
     if (this.authors.length === 0) {
       this.authorDetails = [];
       return;
+    }
+
+    const retryNum = retry || 3;
+
+    // Quit if a newer query has succeeded
+    if (retryID && retryID != this.authorDetailAPIRetryID) {
+      return;
+    }
+
+    // Record this query as the newest query
+    if (retryID === undefined) {
+      this.authorDetailAPIRetryID += 1;
     }
 
     try {
@@ -91,9 +104,9 @@ export class RecRecAuthorList extends LitElement {
       this.authorDetails = data;
     } catch (e) {
       await new Promise<void>(resolve => {
-        setTimeout(resolve, 2000);
+        setTimeout(resolve, 1000);
       });
-      await this.updateAuthorDetails(retry - 1);
+      await this.updateAuthorDetails(retryNum - 1, this.authorDetailAPIRetryID);
     }
   }
 
