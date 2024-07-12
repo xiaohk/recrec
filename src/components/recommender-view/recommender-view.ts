@@ -793,12 +793,18 @@ export class RecRecRecommenderView extends LitElement {
     e.stopPropagation();
     e.preventDefault();
 
-    this.citeTimeBlurred();
-
     if (!this.paperOverlayElement) {
       console.error('paperOverlayElement are not initialized yet.');
       return;
     }
+
+    const overlayName = `${type}-${recommender.authorID}`;
+    if (this.paperOverlayElement.getAttribute('data-name') === overlayName) {
+      this.citeTimeBlurred();
+      return;
+    }
+
+    this.citeTimeBlurred();
 
     // Hide the description tooltip
     this.citeTimeButtonMouseLeft(e);
@@ -843,6 +849,10 @@ export class RecRecRecommenderView extends LitElement {
 
     this.curClickedCiteTimeAuthorID = recommender.authorID;
     this.paperOverlayElement.classList.remove('hidden');
+    this.paperOverlayElement.setAttribute(
+      'data-name',
+      `${type}-${recommender.authorID}`
+    );
   }
 
   citeTimeButtonMouseEntered(
@@ -903,6 +913,7 @@ export class RecRecRecommenderView extends LitElement {
     }
 
     this.paperOverlayElement.classList.add('hidden');
+    this.paperOverlayElement.removeAttribute('data-name');
     this.curClickedCiteTimeAuthorID = null;
     this.overlayCleanup();
     this.overlayCleanup = () => {};
