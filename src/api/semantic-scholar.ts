@@ -41,6 +41,12 @@ const authorCitationSearchMocks = [
   authorCitationSearchMockJSON9 as SemanticAuthorDetail[]
 ];
 
+const proxyFetch = (url: string, options?: RequestInit) => {
+  const proxyUrl = 'https://recrec-api.jay-8dc.workers.dev';
+  const newURL = `${proxyUrl}?proxyUrl=${encodeURIComponent(url)}`;
+  return fetch(newURL, options);
+};
+
 /**
  * Searches for an author by name using the Semantic Scholar API.
  * @param query - The name of the author to search for.
@@ -52,7 +58,7 @@ export const searchAuthorByName = async (
 ): Promise<SemanticAuthorSearchResponse> => {
   const baseURL = 'https://api.semanticscholar.org/graph/v1/author/search';
   const url = `${baseURL}?query=${encodeURIComponent(query)}`;
-  const result = await fetch(url);
+  const result = await proxyFetch(url);
   if (!result.ok) {
     throw Error(`Search request failed with status: ${result.statusText}`);
   }
@@ -104,7 +110,7 @@ export const searchAuthorDetails = async (
 
   // Fetch the author details
   try {
-    const response = await fetch(url, options);
+    const response = await proxyFetch(url, options);
     const data = (await response.json()) as SemanticAuthorDetail[];
 
     // downloadJSON(data, null, 'author.json');
@@ -137,7 +143,7 @@ export const getAllPapersFromAuthor = async (authorID: string) => {
     const url = `${baseURL}?${encodedParameters.toString()}`;
 
     // Fetch the paper details
-    const response = await fetch(url);
+    const response = await proxyFetch(url);
     if (!response.ok) {
       throw Error(
         `Fetch error when getting paper details, status: ${response.status}`
@@ -189,7 +195,7 @@ export const getPaperCitations = async (paperIDs: string[]) => {
   const url = `${baseURL}?${encodedParameters.toString()}`;
 
   // Fetch the author details
-  const response = await fetch(url, options);
+  const response = await proxyFetch(url, options);
   if (!response.ok) {
     throw Error(
       `Fetch error when getting author details, status: ${response.status}`
