@@ -98,6 +98,8 @@ Navigate to localhost:3000. You should see RecRec running in your browser :)
 
 RecRec is created by <a href='https://zijie.wang/' target='_blank'>Jay Wang</a>.
 
+We appreciate valuable feedback from [Polo Chau](https://poloclub.github.io/polochau/), [Kaan Sancak](https://www.kaansancak.com), [Haekyu Park](https://haekyu.com), and [Alex Kale](https://people.cs.uchicago.edu/~kalea/)! 🙌
+
 ## Citation
 
 If you find RecRec useful, please consider citing it.
