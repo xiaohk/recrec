@@ -19,6 +19,20 @@ import componentCSS from './author-view.css?inline';
 import iconSearch from '../../images/icon-search.svg?raw';
 
 /**
+ * Extract the author ID from a Semantic Scholar profile URL or a bare ID.
+ * @param query Search query
+ * @returns Author ID, or null if the query is not a profile URL or ID
+ */
+const getAuthorIDFromQuery = (query: string) => {
+  const match = query
+    .trim()
+    .match(
+      /^(?:(?:https?:\/\/)?(?:www\.)?semanticscholar\.org\/author\/(?:[^/?#]+\/)?)?(\d+)\/?(?:[?#].*)?$/
+    );
+  return match ? match[1] : null;
+};
+
+/**
  * Author view element.
  */
 @customElement('recrec-author-view')
@@ -122,10 +136,16 @@ export class RecRecAuthorView extends LitElement {
       return;
     }
 
-    const data = await searchAuthorByName(query);
+    // Look up the author directly if the query is a profile URL or ID
+    const authorID = getAuthorIDFromQuery(query);
+    if (authorID !== null) {
+      this.searchAuthors = [{ authorId: authorID, name: '' }];
+    } else {
+      const data = await searchAuthorByName(query);
 
-    // Pass the author info to the author list component
-    this.searchAuthors = data.data;
+      // Pass the author info to the author list component
+      this.searchAuthors = data.data;
+    }
     this.lastCompletedQuery = query;
 
     if (this.searchAuthors.length > 0) {
@@ -167,7 +187,7 @@ export class RecRecAuthorView extends LitElement {
             <sl-input
               type="search"
               size="medium"
-              placeholder="Type your name to search your Semantic Scholar profile"
+              placeholder="Type your name or paste your Semantic Scholar profile URL"
               spellcheck="false"
               clearable
               @sl-input=${(e: InputEvent) => this.searchInput(e)}
